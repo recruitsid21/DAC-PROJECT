@@ -1,0 +1,34 @@
+{
+  "name": "dac-project",
+  "version": "1.0.0",
+  "description": "<br>\r Update all your work here...\r <br>\r UPDATE DAILY...",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run dev:server\" \"npm run client\"",
+    "dev:server": "cd server && npm run dev",
+    "client": "cd client && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recruitsid21/DAC-PROJECT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/recruitsid21/DAC-PROJECT/issues"
+  },
+  "homepage": "https://github.com/recruitsid21/DAC-PROJECT#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10"
+  }
+}
