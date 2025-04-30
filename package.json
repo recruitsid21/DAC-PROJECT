@@ -9,12 +9,18 @@
     "dev:server": "cd server && npm run dev",
     "client": "cd client && npm run dev"
   },
-
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectDac05/DacProject-Sanket.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
- 
+  "bugs": {
+    "url": "https://github.com/ProjectDac05/DacProject-Sanket/issues"
+  },
+  "homepage": "https://github.com/ProjectDac05/DacProject-Sanket#readme",
   "devDependencies": {
     "concurrently": "^7.6.0"
   },
