@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/recruitsid21/DAC-PROJECT.git"
+    "url": "git+https://github.com/ProjectDac05/DacProject-Sanket.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/recruitsid21/DAC-PROJECT/issues"
+    "url": "https://github.com/ProjectDac05/DacProject-Sanket/issues"
   },
-  "homepage": "https://github.com/recruitsid21/DAC-PROJECT#readme",
+  "homepage": "https://github.com/ProjectDac05/DacProject-Sanket#readme",
   "devDependencies": {
     "concurrently": "^7.6.0"
   },
