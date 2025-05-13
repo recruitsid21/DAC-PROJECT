@@ -1,10 +1,14 @@
 // Import core packages
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // Import middlewares
 const errorHandler = require("./middlewares/errorHandler");
@@ -16,32 +20,65 @@ const app = express();
 // Global Middlewares
 // ====================
 
-// Enable Cross-Origin Resource Sharing (for frontend-backend communication)
-app.use(cors());
+// Enable Cross-Origin Resource Sharing
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL,
+//     credentials: true,
+//   })
+// );
+const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
 
-// Parse incoming JSON payloads (body parser)
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+console.log("Client URL:", process.env.CLIENT_URL); // Log the URL
+
+// Parse cookies
+app.use(cookieParser());
+
+// Parse incoming JSON payloads
 app.use(express.json());
+
+// Attach db to request
+app.use((req, res, next) => {
+  req.db = require("./config/db");
+  next();
+});
 
 // ====================
 // Route Middlewares
 // ====================
 
-// Authentication Routes (Login, Register)
+// Authentication Routes
 app.use("/api/auth", authRoutes);
 
-// Event Routes (Example: protected later by authMiddleware)
-// To protect, uncomment and adjust as needed:
-// const protect = require("./middlewares/authMiddleware");
-// app.use("/api/events", protect, eventRoutes);
-
-// Public Event Routes (currently without protection)
+// Event Routes
 app.use("/api/events", eventRoutes);
+
+// Booking Routes
+app.use("/api/bookings", bookingRoutes);
+
+// Payment Routes
+app.use("/api/payments", paymentRoutes);
+
+// Admin Routes
+app.use("/api/admin", adminRoutes);
 
 // ====================
 // Error Handler Middleware
 // ====================
 
-// Centralized error handling for all routes
 app.use(errorHandler);
 
 // Export app for server.js to use

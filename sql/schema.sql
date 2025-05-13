@@ -80,7 +80,7 @@ CREATE TABLE events (
 CREATE TABLE seats (
   seat_id INT PRIMARY KEY AUTO_INCREMENT,
   event_id INT NOT NULL,
-  seat_number VARCHAR(10) NOT NULL,
+  seat_number VARCHAR(20) NOT NULL,
   seat_type ENUM('regular', 'vip', 'premium') DEFAULT 'regular',
   price_multiplier DECIMAL(3,2) DEFAULT 1.00,
   is_booked BOOLEAN DEFAULT FALSE,
