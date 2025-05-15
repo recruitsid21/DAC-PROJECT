@@ -174,3 +174,8 @@ BEGIN
   WHERE event_id = (SELECT event_id FROM seats WHERE seat_id = OLD.seat_id);
 END//
 DELIMITER ;
+
+-- Added this for implementing forgetpassword and resetpassword
+ALTER TABLE users
+ADD COLUMN reset_token VARCHAR(255) AFTER lockout_time,
+ADD COLUMN reset_token_expires DATETIME AFTER reset_token;

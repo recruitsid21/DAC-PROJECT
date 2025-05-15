@@ -2,6 +2,7 @@ import { useAuth } from "../../context/useAuth";
 
 export default function UserDashboard() {
   const { user } = useAuth();
+  console.log("user:", user);
 
   return (
     <div className="container mx-auto px-4 py-8">
