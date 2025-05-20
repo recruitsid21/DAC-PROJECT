@@ -33,12 +33,12 @@ module.exports = {
       );
 
       // 3) Check if user still exists
-      const [user] = await db.query(
+      const [rows] = await db.query(
         "SELECT user_id, name, email, role FROM users WHERE user_id = ?",
         [decoded.id]
       );
 
-      if (!user.length) {
+      if (!rows.length) {
         return next(
           new AppError(
             "The user belonging to this token no longer exists.",
@@ -51,7 +51,7 @@ module.exports = {
       // Add this if you implement password change functionality
 
       // Grant access to protected route
-      req.user = user[0];
+      req.user = rows[0];
       next();
     } catch (err) {
       if (err.name === "JsonWebTokenError") {

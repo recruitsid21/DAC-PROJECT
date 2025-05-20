@@ -157,6 +157,43 @@ class Event {
     );
     return rows[0].count;
   }
+
+  static async addSeats(eventId, seats) {
+    // Start a transaction
+    const connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      // Insert all seats
+      const values = seats.map((seat) => [
+        eventId,
+        seat.seat_number,
+        seat.seat_type,
+        seat.price_multiplier,
+      ]);
+
+      await connection.query(
+        `INSERT INTO seats (event_id, seat_number, seat_type, price_multiplier)
+         VALUES ?`,
+        [values]
+      );
+
+      // Update total_seats in events table
+      await connection.query(
+        `UPDATE events 
+         SET total_seats = ?, available_seats = ?
+         WHERE event_id = ?`,
+        [seats.length, seats.length, eventId]
+      );
+
+      await connection.commit();
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
+    }
+  }
 }
 
 module.exports = Event;

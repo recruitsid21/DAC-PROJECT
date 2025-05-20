@@ -16,6 +16,20 @@ const api = axios.create({
   },
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -26,7 +40,6 @@ api.interceptors.request.use(
       baseURL: config.baseURL,
       fullURL: `${config.baseURL}${config.url}`,
       hasToken: !!token,
-      headers: config.headers,
     });
 
     if (token) {
@@ -49,7 +62,6 @@ api.interceptors.response.use(
     console.log("Response interceptor success:", {
       url: response.config.url,
       status: response.status,
-      headers: response.headers,
     });
     return response;
   },
@@ -62,50 +74,57 @@ api.interceptors.response.use(
       retried: !!originalRequest?._retry,
     });
 
-    // If the error is 401 and we haven't tried to refresh the token yet
-    // AND it's not a login or refresh token request
+    // If the error is 401 and we haven't retried yet
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes("/auth/login") &&
-      originalRequest.url !== "/auth/refresh-token"
+      !originalRequest.url.includes("/auth/refresh-token")
     ) {
+      if (isRefreshing) {
+        try {
+          const token = await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+
       originalRequest._retry = true;
-      console.log("Attempting token refresh...");
+      isRefreshing = true;
 
       try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          throw new Error("No refresh token available");
+        }
+
         // Try to refresh the token
         const response = await api.post("/auth/refresh-token");
         const { accessToken } = response.data;
-        console.log("Token refresh successful");
 
-        // Update the token in localStorage
+        if (!accessToken) {
+          throw new Error("No access token received");
+        }
+
         localStorage.setItem("accessToken", accessToken);
-
-        // Update the Authorization header
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-        // Retry the original request
+        processQueue(null, accessToken);
         return api(originalRequest);
       } catch (refreshError) {
-        console.error("Token refresh failed:", {
-          message: refreshError.message,
-          status: refreshError.response?.status,
-          data: refreshError.response?.data,
-        });
-        // If refresh token fails, log out the user
+        processQueue(refreshError, null);
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
         window.location.href = "/login?session_expired=true";
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
-    }
-
-    // If the error is 403 (Forbidden)
-    if (error.response?.status === 403) {
-      console.log("Access forbidden - redirecting to login");
-      // Handle forbidden access
-      window.location.href = "/login?access_denied=true";
     }
 
     return Promise.reject(error);
