@@ -528,19 +528,27 @@ class AdminController {
 
   static async getReports(req, res, next) {
     try {
-      const { startDate, endDate } = req.query;
+      let { startDate, endDate } = req.query;
+
+      // If dates are not provided, default to last 30 days
+      if (!startDate || !endDate) {
+        endDate = new Date().toISOString().split("T")[0];
+        startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0];
+      }
 
       // Revenue by month
       const [revenueByMonth] = await db.query(
         `SELECT 
           DATE_FORMAT(b.booking_date, '%Y-%m') as month,
-          COUNT(b.booking_id) as bookings,
-          COALESCE(SUM(p.amount), 0) as revenue
+          COUNT(DISTINCT b.booking_id) as bookings,
+          COALESCE(SUM(b.total_amount), 0) as revenue
         FROM bookings b
-        LEFT JOIN payments p ON b.booking_id = p.booking_id
-        WHERE b.booking_date BETWEEN ? AND ?
+        WHERE b.status = 'confirmed'
+          AND b.booking_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)
         GROUP BY DATE_FORMAT(b.booking_date, '%Y-%m')
-        ORDER BY month DESC`,
+        ORDER BY month ASC`,
         [startDate, endDate]
       );
 
@@ -549,13 +557,12 @@ class AdminController {
         `SELECT 
           c.name as category,
           COUNT(DISTINCT e.event_id) as events,
-          COUNT(b.booking_id) as bookings,
-          COALESCE(SUM(p.amount), 0) as revenue
+          COUNT(DISTINCT b.booking_id) as bookings,
+          COALESCE(SUM(b.total_amount), 0) as revenue
         FROM categories c
         LEFT JOIN events e ON c.category_id = e.category_id
-        LEFT JOIN bookings b ON e.event_id = b.event_id
-        LEFT JOIN payments p ON b.booking_id = p.booking_id
-        WHERE (b.booking_date BETWEEN ? AND ?) OR b.booking_date IS NULL
+        LEFT JOIN bookings b ON e.event_id = b.event_id AND b.status = 'confirmed'
+          AND b.booking_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)
         GROUP BY c.category_id
         ORDER BY revenue DESC`,
         [startDate, endDate]
@@ -566,13 +573,14 @@ class AdminController {
         `SELECT 
           e.event_id,
           e.title,
-          COUNT(b.booking_id) as bookings,
-          COALESCE(SUM(p.amount), 0) as revenue
+          COUNT(DISTINCT b.booking_id) as bookings,
+          COALESCE(SUM(b.total_amount), 0) as revenue
         FROM events e
         LEFT JOIN bookings b ON e.event_id = b.event_id
-        LEFT JOIN payments p ON b.booking_id = p.booking_id
-        WHERE b.booking_date BETWEEN ? AND ?
+        WHERE b.status = 'confirmed'
+          AND b.booking_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)
         GROUP BY e.event_id
+        HAVING bookings > 0
         ORDER BY revenue DESC
         LIMIT 10`,
         [startDate, endDate]
@@ -584,15 +592,15 @@ class AdminController {
           u.user_id,
           u.name,
           COUNT(DISTINCT e.event_id) as total_events,
-          COUNT(b.booking_id) as total_bookings,
-          COALESCE(SUM(p.amount), 0) as total_revenue
+          COUNT(DISTINCT b.booking_id) as total_bookings,
+          COALESCE(SUM(b.total_amount), 0) as total_revenue
         FROM users u
         LEFT JOIN events e ON u.user_id = e.organizer_id
         LEFT JOIN bookings b ON e.event_id = b.event_id
-        LEFT JOIN payments p ON b.booking_id = p.booking_id
         WHERE u.role = 'organizer'
-          AND (b.booking_date BETWEEN ? AND ? OR b.booking_date IS NULL)
+          AND (b.status = 'confirmed' AND b.booking_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY))
         GROUP BY u.user_id
+        HAVING total_bookings > 0
         ORDER BY total_revenue DESC
         LIMIT 10`,
         [startDate, endDate]
