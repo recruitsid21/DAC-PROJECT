@@ -111,28 +111,44 @@ class BookingController {
       next(err);
     }
   }
-
   static async getUserBookings(req, res, next) {
     try {
-      const bookings = await Booking.findByUser(req.user.user_id);
+      console.log("getUserBookings called with:", {
+        user: req.user,
+        headers: req.headers,
+        cookies: req.cookies,
+      });
 
-      // Get seats for each booking
-      const bookingsWithSeats = await Promise.all(
-        bookings.map(async (booking) => {
-          const seats = await Booking.getBookedSeats(booking.booking_id);
-          return { ...booking, seats };
-        })
+      if (!req.user || !req.user.user_id) {
+        console.error("No user ID found in request");
+        return next(new AppError("User not authenticated", 401));
+      }
+
+      // First check if user has any bookings at all
+      const [bookingCount] = await db.query(
+        "SELECT COUNT(*) as count FROM bookings WHERE user_id = ?",
+        [req.user.user_id]
       );
 
+      console.log("Total bookings found:", bookingCount[0].count);
+
+      const bookings = await Booking.findByUser(req.user.user_id);
+      console.log(
+        "Found bookings after processing:",
+        JSON.stringify(bookings, null, 2)
+      );
+
+      // Always return an array, even if empty
       res.status(200).json({
         status: "success",
-        results: bookingsWithSeats.length,
         data: {
-          bookings: bookingsWithSeats,
+          bookings: Array.isArray(bookings) ? bookings : [],
         },
       });
     } catch (err) {
-      next(err);
+      console.error("Error in getUserBookings:", err);
+      console.error("Error stack:", err.stack);
+      return next(new AppError(err.message || "Error fetching bookings", 500));
     }
   }
 

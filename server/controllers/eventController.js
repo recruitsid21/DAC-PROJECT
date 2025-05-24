@@ -5,13 +5,40 @@ const AppError = require("../utils/appError");
 class EventController {
   static async getAllEvents(req, res, next) {
     try {
-      const { category_id, search, page = 1, limit = 10 } = req.query;
+      const {
+        search,
+        category,
+        dateFrom,
+        dateTo,
+        sortBy,
+        minPrice,
+        maxPrice,
+        page = 1,
+        limit = 10,
+      } = req.query;
+
+      console.log("Search parameters:", {
+        search,
+        category,
+        dateFrom,
+        dateTo,
+        sortBy,
+        minPrice,
+        maxPrice,
+        page,
+        limit,
+      });
 
       const events = await Event.findAll({
         page: parseInt(page),
         limit: parseInt(limit),
-        category_id: category_id ? parseInt(category_id) : undefined,
         search,
+        category,
+        dateFrom,
+        dateTo,
+        sortBy,
+        minPrice,
+        maxPrice,
       });
 
       res.status(200).json({

@@ -24,19 +24,21 @@ module.exports = {
             401
           )
         );
-      }
-
-      // 2) Verify token
+      } // 2) Verify token
+      console.log("Verifying token:", token);
       const decoded = await promisify(jwt.verify)(
         token,
         process.env.JWT_SECRET || "your-secret-key"
       );
+      console.log("Decoded token:", decoded);
 
       // 3) Check if user still exists
       const [rows] = await db.query(
         "SELECT user_id, name, email, role FROM users WHERE user_id = ?",
         [decoded.id]
       );
+
+      console.log("User found:", rows[0]);
 
       if (!rows.length) {
         return next(

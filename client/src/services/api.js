@@ -34,12 +34,16 @@ const processQueue = (error, token = null) => {
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    console.log("Request interceptor:", {
+    const user = localStorage.getItem("user");
+
+    console.log("API Request:", {
       url: config.url,
       method: config.method,
       baseURL: config.baseURL,
       fullURL: `${config.baseURL}${config.url}`,
       hasToken: !!token,
+      hasUser: !!user,
+      headers: config.headers,
     });
 
     if (token) {
@@ -127,6 +131,27 @@ api.interceptors.response.use(
       }
     }
 
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log("API Response:", {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
+  (error) => {
+    console.error("API Error:", {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data,
+    });
     return Promise.reject(error);
   }
 );

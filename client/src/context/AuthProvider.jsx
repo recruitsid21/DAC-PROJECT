@@ -11,7 +11,14 @@ export function AuthProvider({ children }) {
       const token = localStorage.getItem("accessToken");
       const storedUser = localStorage.getItem("user");
 
+      console.log("Auth state:", {
+        hasToken: !!token,
+        hasStoredUser: !!storedUser,
+        storedUser: storedUser ? JSON.parse(storedUser) : null,
+      });
+
       if (!token || !storedUser) {
+        console.log("No token or stored user found");
         // Clear any potentially invalid data
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
@@ -25,9 +32,13 @@ export function AuthProvider({ children }) {
 
       // Try to get user data from API
       const response = await api.get("/auth/me");
+      console.log("Auth check response:", response.data);
+
       if (response.data && response.data.data && response.data.data.user) {
+        console.log("Setting user:", response.data.data.user);
         setUser(response.data.data.user);
       } else {
+        console.log("Invalid user data in response");
         // Clear invalid data
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");

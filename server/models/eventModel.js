@@ -58,8 +58,17 @@ class Event {
     );
     return rows[0];
   }
-
-  static async findAll({ page = 1, limit = 10, category_id, search } = {}) {
+  static async findAll({
+    page = 1,
+    limit = 10,
+    category,
+    search,
+    dateFrom,
+    dateTo,
+    minPrice,
+    maxPrice,
+    sortBy = "date_asc",
+  } = {}) {
     let query = `SELECT e.*, u.name as organizer_name, c.name as category_name 
                  FROM events e
                  LEFT JOIN users u ON e.organizer_id = u.user_id
@@ -68,9 +77,9 @@ class Event {
 
     const params = [];
 
-    if (category_id) {
-      query += " AND e.category_id = ?";
-      params.push(category_id);
+    if (category) {
+      query += " AND c.name = ?";
+      params.push(category);
     }
 
     if (search) {
@@ -79,7 +88,43 @@ class Event {
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
-    query += " ORDER BY e.date ASC, e.time ASC";
+    if (dateFrom) {
+      query += " AND e.date >= ?";
+      params.push(dateFrom);
+    }
+
+    if (dateTo) {
+      query += " AND e.date <= ?";
+      params.push(dateTo);
+    }
+
+    if (minPrice !== undefined && minPrice !== "") {
+      query += " AND e.price >= ?";
+      params.push(parseFloat(minPrice));
+    }
+
+    if (maxPrice !== undefined && maxPrice !== "") {
+      query += " AND e.price <= ?";
+      params.push(parseFloat(maxPrice));
+    }
+
+    // Add sorting
+    switch (sortBy) {
+      case "date_asc":
+        query += " ORDER BY e.date ASC, e.time ASC";
+        break;
+      case "date_desc":
+        query += " ORDER BY e.date DESC, e.time DESC";
+        break;
+      case "price_asc":
+        query += " ORDER BY e.price ASC";
+        break;
+      case "price_desc":
+        query += " ORDER BY e.price DESC";
+        break;
+      default:
+        query += " ORDER BY e.date ASC, e.time ASC";
+    }
 
     // Add pagination
     const offset = (page - 1) * limit;

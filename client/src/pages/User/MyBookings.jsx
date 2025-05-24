@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import api from "../../services/api";
 
 export default function MyBookings() {
@@ -12,14 +12,111 @@ export default function MyBookings() {
   useEffect(() => {
     fetchBookings();
   }, []);
-
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/bookings/my-bookings");
 
-      setUpcomingBookings(response.data.data.upcomingBookings || []);
-      setPastBookings(response.data.data.pastBookings || []);
+      // Check if we're authenticated
+      const token = localStorage.getItem("accessToken");
+      const storedUser = localStorage.getItem("user");
+      console.log("Auth state in MyBookings:", {
+        hasToken: !!token,
+        hasStoredUser: !!storedUser,
+        storedUser: storedUser ? JSON.parse(storedUser) : null,
+      });
+
+      if (!token || !storedUser) {
+        console.error("Not authenticated");
+        setError("Please log in to view your bookings");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Fetching bookings with token:", token);
+      const response = await api.get("/bookings/my-bookings");
+      console.log("Full API Response:", response);
+      console.log("Bookings response data:", response.data);
+
+      // Get all bookings from the response
+      const allBookings = response.data.data.bookings || [];
+      console.log("All bookings:", JSON.stringify(allBookings, null, 2));
+
+      if (allBookings.length === 0) {
+        console.log("No bookings found in the response");
+        setUpcomingBookings([]);
+        setPastBookings([]);
+        setError(null);
+        setLoading(false);
+        return;
+      }
+
+      // Separate bookings into upcoming and past based on event date
+      const now = new Date();
+      console.log("Current date:", now);
+
+      const separated = allBookings.reduce(
+        (acc, booking) => {
+          try {
+            console.log("Processing booking:", booking);
+
+            // Ensure we have valid date and time strings
+            if (!booking.event?.date || !booking.event?.time) {
+              console.error("Missing date or time for booking:", booking);
+              return acc;
+            }
+
+            const dateParts = booking.event.date.split("-");
+            const timeParts = booking.event.time.split(":");
+
+            if (dateParts.length !== 3 || timeParts.length !== 3) {
+              console.error(
+                "Invalid date or time format:",
+                booking.event.date,
+                booking.event.time
+              );
+              return acc;
+            }
+
+            const eventDate = new Date(
+              parseInt(dateParts[0]), // year
+              parseInt(dateParts[1]) - 1, // month (0-based)
+              parseInt(dateParts[2]), // day
+              parseInt(timeParts[0]), // hour
+              parseInt(timeParts[1]), // minute
+              parseInt(timeParts[2]) // second
+            );
+
+            console.log("Event date:", eventDate);
+
+            if (isNaN(eventDate.getTime())) {
+              console.error("Invalid date after creation:", eventDate);
+              return acc;
+            }
+
+            if (eventDate >= now) {
+              acc.upcoming.push({
+                ...booking,
+                is_upcoming: true,
+                parsed_date: eventDate,
+              });
+            } else {
+              acc.past.push({
+                ...booking,
+                is_upcoming: false,
+                parsed_date: eventDate,
+              });
+            }
+          } catch (err) {
+            console.error("Error processing booking:", err, booking);
+          }
+          return acc;
+        },
+        { upcoming: [], past: [] }
+      );
+
+      console.log("Separated bookings:", separated);
+      setUpcomingBookings(separated.upcoming);
+      setPastBookings(separated.past);
       setError(null);
     } catch (err) {
       console.error("Error fetching bookings:", err);
@@ -45,13 +142,17 @@ export default function MyBookings() {
   };
 
   const renderBookingCard = (booking) => {
-    const eventDate = parse(
-      `${booking.event.date} ${booking.event.time}`,
-      "yyyy-MM-dd HH:mm:ss",
-      new Date()
-    );
-    const formattedDate = format(eventDate, "EEE, MMM d, yyyy");
-    const formattedTime = format(eventDate, "h:mm a");
+    let formattedDate = "Date not available";
+    let formattedTime = "Time not available";
+
+    try {
+      if (booking.parsed_date && !isNaN(booking.parsed_date.getTime())) {
+        formattedDate = format(booking.parsed_date, "EEE, MMM d, yyyy");
+        formattedTime = format(booking.parsed_date, "h:mm a");
+      }
+    } catch (err) {
+      console.error("Error formatting date:", err);
+    }
 
     return (
       <div
@@ -64,30 +165,33 @@ export default function MyBookings() {
               <div className="relative h-20 w-20 mr-4">
                 <img
                   src={
-                    booking.event.image_url || "/images/event-placeholder.jpg"
+                    booking.event?.image_url || "/images/event-placeholder.jpg"
                   }
-                  alt={booking.event.title}
+                  alt={booking.event?.title || "Event"}
                   className="absolute inset-0 w-full h-full object-cover rounded"
                 />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {booking.event.title}
+                  {booking.event?.title || "Untitled Event"}
                 </h2>
                 <p className="text-gray-600 mt-1">
                   {formattedDate} at {formattedTime}
                 </p>
-                <p className="text-gray-600">{booking.event.location}</p>
+                <p className="text-gray-600">
+                  {booking.event?.location || "Location not available"}
+                </p>
                 <p className="text-gray-600 mt-2">
                   Seats:{" "}
-                  {booking.seats.map((seat) => seat.seat_number).join(", ")}
+                  {booking.seats?.map((seat) => seat.seat_number).join(", ") ||
+                    "No seats available"}
                 </p>
               </div>
             </div>
           </div>
           <div className="text-right">
             <p className="text-lg font-semibold text-gray-900">
-              ₹{booking.total_amount}
+              ₹{booking.total_amount || 0}
             </p>
             <div className="mt-2">
               <span
@@ -97,8 +201,8 @@ export default function MyBookings() {
                     : "bg-yellow-100 text-yellow-800"
                 }`}
               >
-                {booking.status.charAt(0).toUpperCase() +
-                  booking.status.slice(1)}
+                {(booking.status || "unknown").charAt(0).toUpperCase() +
+                  (booking.status || "unknown").slice(1)}
               </span>
             </div>
             {booking.is_upcoming && booking.status === "confirmed" && (
