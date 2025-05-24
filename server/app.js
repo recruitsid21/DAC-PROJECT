@@ -15,8 +15,7 @@ const userRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
-// Temporarily disabled payment routes - will be enabled later
-// const paymentRoutes = require("./routes/paymentRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const creatorRoutes = require("./routes/creatorRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -116,8 +115,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/wishlist", wishlistRoutes);
-// Temporarily disabled payment routes - will be enabled later
-// app.use("/api/payments", paymentRoutes);
+// Payment routes
+app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/creator", creatorRoutes);
 app.use("/api/categories", categoryRoutes);
