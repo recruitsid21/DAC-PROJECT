@@ -16,7 +16,8 @@ export default function MyBookings() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/users/bookings");
+      const response = await api.get("/bookings/my-bookings");
+
       setUpcomingBookings(response.data.data.upcomingBookings || []);
       setPastBookings(response.data.data.pastBookings || []);
       setError(null);
@@ -44,7 +45,11 @@ export default function MyBookings() {
   };
 
   const renderBookingCard = (booking) => {
-    const eventDate = parse(`${booking.event.date} ${booking.event.time}`, 'yyyy-MM-dd HH:mm:ss', new Date());
+    const eventDate = parse(
+      `${booking.event.date} ${booking.event.time}`,
+      "yyyy-MM-dd HH:mm:ss",
+      new Date()
+    );
     const formattedDate = format(eventDate, "EEE, MMM d, yyyy");
     const formattedTime = format(eventDate, "h:mm a");
 

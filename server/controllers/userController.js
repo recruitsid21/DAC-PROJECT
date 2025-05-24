@@ -192,8 +192,8 @@ class UserController {
          ORDER BY 
            event_timing ASC,
            CASE event_timing
-             WHEN 'upcoming' THEN e.date
-             ELSE e.date DESC
+              CASE WHEN event_timing = 'upcoming' THEN e.date ELSE NULL END ASC,
+              CASE WHEN event_timing = 'past' THEN e.date ELSE NULL END DESC,
            END,
            e.time`,
         [req.user.user_id]
