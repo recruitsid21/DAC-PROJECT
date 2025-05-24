@@ -162,10 +162,16 @@ class Event {
     ]);
     return true;
   }
-
   static async getEventSeats(eventId) {
     const [rows] = await db.query(
-      "SELECT * FROM seats WHERE event_id = ? ORDER BY seat_number",
+      `SELECT 
+        s.*,
+        CASE WHEN bs.seat_id IS NOT NULL THEN TRUE ELSE FALSE END as is_booked
+       FROM seats s
+       LEFT JOIN booked_seats bs ON s.seat_id = bs.seat_id
+       LEFT JOIN bookings b ON bs.booking_id = b.booking_id AND b.status = 'confirmed'
+       WHERE s.event_id = ?
+       ORDER BY s.seat_number`,
       [eventId]
     );
     return rows;
