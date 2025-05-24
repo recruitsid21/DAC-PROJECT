@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import api from "../../services/api";
 
 export default function MyBookings() {
@@ -44,7 +44,7 @@ export default function MyBookings() {
   };
 
   const renderBookingCard = (booking) => {
-    const eventDate = new Date(`${booking.event.date} ${booking.event.time}`);
+    const eventDate = parse(`${booking.event.date} ${booking.event.time}`, 'yyyy-MM-dd HH:mm:ss', new Date());
     const formattedDate = format(eventDate, "EEE, MMM d, yyyy");
     const formattedTime = format(eventDate, "h:mm a");
 

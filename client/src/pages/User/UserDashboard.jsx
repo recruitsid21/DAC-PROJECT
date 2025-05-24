@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/useAuth";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import api from "../../services/api";
 
 export default function UserDashboard() {
@@ -85,7 +85,7 @@ export default function UserDashboard() {
             <h3 className="text-lg font-semibold mb-4">Your Upcoming Events</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {upcomingEvents.map((event) => {
-                const eventDate = new Date(`${event.date} ${event.time}`);
+                const eventDate = parse(`${event.date} ${event.time}`, 'yyyy-MM-dd HH:mm:ss', new Date());
                 const formattedDate = format(eventDate, "EEE, MMM d, yyyy");
                 const formattedTime = format(eventDate, "h:mm a");
 
