@@ -226,6 +226,11 @@ class AdminController {
              WHERE bs.booking_id = ?`,
             [bookingId]
           );
+
+          // Delete payment record
+          await db.query("DELETE FROM payments WHERE booking_id = ?", [
+            bookingId,
+          ]);
         } else if (status === "confirmed" && booking.status !== "confirmed") {
           // Check if we have enough available seats
           if (booking.status === "cancelled" && available_seats < seat_count) {

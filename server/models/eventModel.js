@@ -166,11 +166,26 @@ class Event {
     const [rows] = await db.query(
       `SELECT 
         s.*,
-        CASE WHEN bs.seat_id IS NOT NULL THEN TRUE ELSE FALSE END as is_booked
+        COALESCE(MAX(
+          CASE 
+            WHEN bs.seat_id IS NOT NULL AND b.status = 'confirmed' THEN TRUE
+            WHEN s.is_booked = TRUE THEN TRUE
+            ELSE FALSE 
+          END
+        ), FALSE) as is_booked
        FROM seats s
        LEFT JOIN booked_seats bs ON s.seat_id = bs.seat_id
-       LEFT JOIN bookings b ON bs.booking_id = b.booking_id AND b.status = 'confirmed'
+       LEFT JOIN bookings b ON bs.booking_id = b.booking_id
        WHERE s.event_id = ?
+       GROUP BY 
+         s.seat_id, 
+         s.event_id, 
+         s.seat_number, 
+         s.seat_type, 
+         s.price_multiplier, 
+         s.is_booked, 
+         s.created_at, 
+         s.updated_at
        ORDER BY s.seat_number`,
       [eventId]
     );
