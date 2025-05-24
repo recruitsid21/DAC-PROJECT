@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { toast } from "react-toastify";
 import api from "../../services/api";
 import SeatMap from "../../components/events/SeatMap";
@@ -209,10 +209,8 @@ export default function EventDetailsPage() {
   if (!event) return <ErrorMessage message="Event not found" />;
 
   // Ensure valid date-time
-  const eventDateTime = new Date(`${event.date} ${event.time}`);
-  const formattedDate = isNaN(eventDateTime.getTime())
-    ? "Invalid date"
-    : format(eventDateTime, "EEEE, MMMM d, yyyy h:mm a");
+  const eventDateTime = parse(`${event.date} ${event.time}`, 'yyyy-MM-dd HH:mm:ss', new Date());
+  const formattedDate = format(eventDateTime, "EEEE, MMMM d, yyyy h:mm a");
 
   return (
     <div className="container mx-auto px-4 py-8">
