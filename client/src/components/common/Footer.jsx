@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap">
           <div className="w-full md:w-1/3 lg:w-1/4 px-4 mb-8">
-            <h3 className="text-xl font-semibold mb-4">EventBooking</h3>
+            <h3 className="text-xl font-semibold mb-4">Evenza</h3>
             <p className="text-gray-400">
               Your one-stop platform for discovering and booking amazing events.
             </p>
@@ -104,9 +104,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
-          <p>
-            &copy; {new Date().getFullYear()} EventBooking. All rights reserved.
-          </p>
+          <p>&copy; {new Date().getFullYear()} Evenza. All rights reserved.</p>
         </div>
       </div>
     </footer>
