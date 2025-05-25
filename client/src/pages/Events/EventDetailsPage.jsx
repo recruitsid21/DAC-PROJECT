@@ -29,9 +29,13 @@ export default function EventDetailsPage() {
           await Promise.all([
             api.get(`/events/${id}`),
             api.get(`/events/${id}/seats`),
-            api
-              .get(`/wishlist/check/${id}`)
-              .catch(() => ({ data: { isInWishlist: false } })),
+            api.get(`/wishlist/check/${id}`).catch((err) => {
+              // If error is unauthorized, return false but don't show error
+              if (err.response?.status === 401) {
+                return { data: { data: { isInWishlist: false } } };
+              }
+              throw err;
+            }),
           ]);
 
         // Handle event data
@@ -82,7 +86,10 @@ export default function EventDetailsPage() {
           setSeats([]);
         }
 
-        setIsInWishlist(Boolean(wishlistResponse.data.isInWishlist));
+        // Set wishlist state - fixed to properly access nested data structure
+        const wishlistState = wishlistResponse.data.data?.isInWishlist;
+        console.log("Wishlist state from API:", wishlistState); // Debug log
+        setIsInWishlist(Boolean(wishlistState));
       } catch (err) {
         setError(
           err.response?.data?.message || "Failed to fetch event details"
@@ -93,7 +100,9 @@ export default function EventDetailsPage() {
       }
     };
 
-    fetchEventData();
+    if (id) {
+      fetchEventData();
+    }
   }, [id]);
 
   const handleSeatSelect = (seatId) => {
@@ -186,12 +195,13 @@ export default function EventDetailsPage() {
 
       if (isInWishlist) {
         await api.delete(`/wishlist/${id}`);
+        setIsInWishlist(false);
         toast.success("Removed from wishlist");
       } else {
         await api.post(`/wishlist`, { event_id: Number(id) });
+        setIsInWishlist(true);
         toast.success("Added to wishlist");
       }
-      setIsInWishlist(!isInWishlist);
     } catch (err) {
       console.error("Wishlist error:", err.response?.data || err.message);
       if (err.response?.status === 401) {

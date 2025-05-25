@@ -190,14 +190,13 @@ class EventController {
       // Calculate final price for each seat
       const event = await Event.findById(req.params.id);
       const basePrice = parseFloat(event.price) || 0;
-
       const processedSeats = seats.map((seat) => ({
         seat_id: Number(seat.seat_id),
         event_id: Number(seat.event_id),
         seat_number: String(seat.seat_number || ""),
         seat_type: String(seat.seat_type || "regular"),
         price_multiplier: Number(seat.price_multiplier || 1),
-        is_booked: Boolean(seat.is_booked),
+        is_booked: Boolean(seat.is_booked || false),
         final_price: Number(
           (basePrice * (parseFloat(seat.price_multiplier) || 1)).toFixed(2)
         ),

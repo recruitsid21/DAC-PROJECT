@@ -206,6 +206,26 @@ class Booking {
     ]);
     return true;
   }
+
+  static async createPayment({
+    booking_id,
+    amount,
+    payment_method,
+    transaction_id,
+    payment_status,
+  }) {
+    try {
+      const [result] = await db.query(
+        `INSERT INTO payments (booking_id, amount, payment_method, transaction_id, payment_status) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [booking_id, amount, payment_method, transaction_id, payment_status]
+      );
+      return result.insertId;
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Booking;

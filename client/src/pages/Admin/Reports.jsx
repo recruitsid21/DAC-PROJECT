@@ -19,12 +19,33 @@ export default function Reports() {
 
   const fetchReports = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(""); // Clear any previous errors
       const response = await api.get("/admin/reports", {
         params: dateRange,
       });
-      setReports(response.data.data);
+
+      if (response.data && response.data.data) {
+        // Ensure all arrays have default empty arrays if data is missing
+        setReports({
+          revenueByMonth: response.data.data.revenueByMonth || [],
+          bookingsByCategory: response.data.data.bookingsByCategory || [],
+          topEvents: response.data.data.topEvents || [],
+          topOrganizers: response.data.data.topOrganizers || [],
+        });
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (err) {
+      console.error("Reports fetch error:", err);
       setError(err.response?.data?.message || "Failed to fetch reports");
+      // Set empty data when there's an error
+      setReports({
+        revenueByMonth: [],
+        bookingsByCategory: [],
+        topEvents: [],
+        topOrganizers: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -96,6 +117,14 @@ export default function Reports() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
+          <div className="flex items-end">
+            <button
+              onClick={fetchReports}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Update Report
+            </button>
+          </div>
         </div>
       </div>
 
@@ -122,16 +151,32 @@ export default function Reports() {
                 {reports.revenueByMonth.map((item) => (
                   <tr key={item.month}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.month}
+                      {new Date(item.month + "-01").toLocaleDateString(
+                        "en-US",
+                        { year: "numeric", month: "long" }
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      ₹{item.revenue.toLocaleString("en-IN")}
+                      ₹
+                      {Number(item.revenue).toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {item.bookings}
                     </td>
                   </tr>
                 ))}
+                {reports.revenueByMonth.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="3"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No revenue data available for the selected period
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -162,7 +207,7 @@ export default function Reports() {
                 {reports.bookingsByCategory.map((item) => (
                   <tr key={item.category}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.category}
+                      {item.category || "Uncategorized"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
                       {item.events}
@@ -171,10 +216,23 @@ export default function Reports() {
                       {item.bookings}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      ₹{item.revenue.toLocaleString("en-IN")}
+                      ₹
+                      {Number(item.revenue).toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))}
+                {reports.bookingsByCategory.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No category data available for the selected period
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -208,10 +266,23 @@ export default function Reports() {
                       {event.bookings}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      ₹{event.revenue.toLocaleString("en-IN")}
+                      ₹
+                      {Number(event.revenue).toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))}
+                {reports.topEvents.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="3"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No event data available for the selected period
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -251,10 +322,23 @@ export default function Reports() {
                       {organizer.total_bookings}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
-                      ₹{organizer.total_revenue.toLocaleString("en-IN")}
+                      ₹
+                      {Number(organizer.total_revenue).toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))}
+                {reports.topOrganizers.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No organizer data available for the selected period
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

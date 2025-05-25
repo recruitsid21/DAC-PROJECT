@@ -50,14 +50,19 @@ class BookingController {
           bookingId,
         ]);
         return next(new AppError(error.message || "Failed to book seats", 400));
-      }
-
-      // 6) Update available seats in event
+      } // 6) Update available seats in event
       await Event.update(event_id, {
         available_seats: event.available_seats - seat_ids.length,
+      }); // 7) Create initial payment record
+      await Booking.createPayment({
+        booking_id: bookingId,
+        amount: total_amount,
+        payment_method: "razorpay",
+        transaction_id: null,
+        payment_status: "captured", // Using captured for successful payments
       });
 
-      // 7) Get booking details with seats
+      // 8) Get booking details with seats
       const booking = await Booking.findById(bookingId);
       const bookedSeats = await Booking.getBookedSeats(bookingId);
 

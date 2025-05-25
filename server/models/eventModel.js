@@ -162,10 +162,31 @@ class Event {
     ]);
     return true;
   }
-
   static async getEventSeats(eventId) {
     const [rows] = await db.query(
-      "SELECT * FROM seats WHERE event_id = ? ORDER BY seat_number",
+      `SELECT 
+        s.*,
+        COALESCE(MAX(
+          CASE 
+            WHEN bs.seat_id IS NOT NULL AND b.status = 'confirmed' THEN TRUE
+            WHEN s.is_booked = TRUE THEN TRUE
+            ELSE FALSE 
+          END
+        ), FALSE) as is_booked
+       FROM seats s
+       LEFT JOIN booked_seats bs ON s.seat_id = bs.seat_id
+       LEFT JOIN bookings b ON bs.booking_id = b.booking_id
+       WHERE s.event_id = ?
+       GROUP BY 
+         s.seat_id, 
+         s.event_id, 
+         s.seat_number, 
+         s.seat_type, 
+         s.price_multiplier, 
+         s.is_booked, 
+         s.created_at, 
+         s.updated_at
+       ORDER BY s.seat_number`,
       [eventId]
     );
     return rows;

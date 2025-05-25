@@ -35,85 +35,70 @@ INSERT INTO categories (name, description, image_url, is_active) VALUES
 ('Workshops', 'Educational and skill-building workshops', 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500', TRUE);
 
 -- Insert events
-INSERT INTO events (
-    title, description, short_description, date, time, 
-    end_date, end_time, location, venue_details,
-    capacity, total_seats, available_seats, price, 
-    category_id, organizer_id, image_url
-) VALUES
-('Summer Music Festival 2024', 
- 'A 3-day music festival featuring top artists from around the world. Experience the best in pop, rock, and electronic music.',
- 'Weekend music extravaganza with top artists',
- '2024-06-15', '16:00:00', '2024-06-17', '23:00:00',
- 'Mumbai Grounds', 'Gate 3, Near Western Express Highway, Mumbai',
- 5000, 5000, 5000, 2500.00, 
- 1, 2, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=500'),
+-- Insert sample events (MAX SEATS: 100)
+INSERT INTO events (title, description, short_description, date, time, end_date, end_time, location, venue_details, capacity, total_seats, available_seats, price, category_id, organizer_id, is_active, image_url)
+VALUES
+('Rock Music Fest', 'An electrifying rock concert', 'Rock concert with popular bands', '2025-06-15', '19:00:00', '2025-06-15', '22:00:00', 'Mumbai Arena', 'Gate 3, Sector 5', 100, 100, 100, 500.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=500'),
+('Techno Beats Night', 'Dance the night away with techno vibes', 'Techno music with top DJs', '2025-07-10', '20:00:00', '2025-07-10', '23:30:00', 'Bangalore Club', 'Hall A, 2nd Floor', 80, 80, 80, 600.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=500'),
+('Jazz & Blues Evening', 'Smooth jazz and blues session', 'Evening of live jazz music', '2025-06-22', '18:00:00', '2025-06-22', '21:00:00', 'Kolkata Auditorium', 'Main Hall', 50, 50, 50, 450.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=500'),
+('Hip Hop Live', 'Live hip hop performances', 'Hip hop concert', '2025-08-05', '19:30:00', '2025-08-05', '22:30:00', 'Delhi Grounds', 'Open Stage Area', 90, 90, 90, 700.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1440660405495-b26acc5309a2?q=80&w=2070&auto=format&fit=crop&w=500'),
+('Indie Vibes Festival', 'Celebrate Indie music', 'Indie bands and artists', '2025-07-25', '17:00:00', '2025-07-25', '21:00:00', 'Hyderabad Arena', 'South Wing', 100, 100, 100, 400.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=500');
 
-('IPL Finals 2024',
- 'Experience the grand finale of Indian Premier League 2024. Watch the top teams battle for the championship.',
- 'T20 Championship final match',
- '2024-05-20', '19:30:00', '2024-05-20', '23:30:00',
- 'Wankhede Stadium', 'North Stand, Marine Drive, Mumbai',
- 35000, 35000, 35000, 3500.00,
- 2, 2, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=500'),
-
-('The Lion King Musical',
- 'Award-winning Broadway musical with stunning visuals, amazing costumes, and unforgettable music.',
- 'World-famous Broadway musical',
- '2024-04-05', '19:00:00', '2024-04-05', '22:30:00',
- 'Delhi Auditorium', 'Central Delhi Theater District',
- 500, 500, 500, 4500.00,
- 3, 3, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=500');
 
 -- Insert seats for events
--- Music Festival VIP Seats (event_id 1)
-INSERT INTO seats (event_id, seat_number, seat_type, price_multiplier)
-SELECT 1, CONCAT('VIP-', LPAD(num, 3, '0')), 'vip', 2.00
-FROM (SELECT 1 + tens.num + hundreds.num * 10 as num
-      FROM (SELECT 0 as num UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) tens,
-           (SELECT 0 as num UNION SELECT 10 UNION SELECT 20 UNION SELECT 30 UNION SELECT 40 UNION SELECT 50 UNION SELECT 60 UNION SELECT 70 UNION SELECT 80 UNION SELECT 90) hundreds
-      WHERE 1 + tens.num + hundreds.num * 10 <= 100) numbers;
+-- Automatically generate seats per event (based on total_seats for each event)
 
--- IPL Finals Premium Seats (event_id 2)
-INSERT INTO seats (event_id, seat_number, seat_type, price_multiplier)
-SELECT 2, CONCAT('P-', LPAD(num, 3, '0')), 'premium', 1.50
-FROM (SELECT 1 + tens.num + hundreds.num * 10 as num
-      FROM (SELECT 0 as num UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) tens,
-           (SELECT 0 as num UNION SELECT 10 UNION SELECT 20 UNION SELECT 30 UNION SELECT 40 UNION SELECT 50 UNION SELECT 60 UNION SELECT 70 UNION SELECT 80 UNION SELECT 90) hundreds
-      WHERE 1 + tens.num + hundreds.num * 10 <= 100) numbers;
+-- Seats for Rock Music Fest (100 seats)
+INSERT INTO seats (event_id, seat_number, is_booked)
+SELECT 1, CONCAT('A', LPAD(n, 3, '0')), FALSE
+FROM (SELECT ROW_NUMBER() OVER () as n FROM information_schema.tables LIMIT 100) AS seatgen;
 
--- Theater Premium Seats (event_id 3)
-INSERT INTO seats (event_id, seat_number, seat_type, price_multiplier)
-SELECT 3, CONCAT('A-', LPAD(num, 2, '0')), 'premium', 1.50
-FROM (SELECT 1 + tens.num + hundreds.num * 10 as num
-      FROM (SELECT 0 as num UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) tens,
-           (SELECT 0 as num UNION SELECT 10 UNION SELECT 20 UNION SELECT 30 UNION SELECT 40 UNION SELECT 50) hundreds
-      WHERE 1 + tens.num + hundreds.num * 10 <= 50) numbers;
+-- Seats for Techno Beats Night (80 seats)
+INSERT INTO seats (event_id, seat_number, is_booked)
+SELECT 2, CONCAT('B', LPAD(n, 3, '0')), FALSE
+FROM (SELECT ROW_NUMBER() OVER () as n FROM information_schema.tables LIMIT 80) AS seatgen;
 
--- Insert sample bookings
-INSERT INTO bookings (event_id, user_id, status, total_amount) VALUES
-(1, 4, 'confirmed', 10000.00),
-(2, 5, 'confirmed', 7000.00);
+-- Seats for Jazz & Blues Evening (50 seats)
+INSERT INTO seats (event_id, seat_number, is_booked)
+SELECT 3, CONCAT('C', LPAD(n, 3, '0')), FALSE
+FROM (SELECT ROW_NUMBER() OVER () as n FROM information_schema.tables LIMIT 50) AS seatgen;
 
--- Insert booked seats (using first few seats from each event)
-INSERT INTO booked_seats (booking_id, seat_id, price_paid) 
-SELECT b.booking_id, s.seat_id, e.price * s.price_multiplier as price_paid
-FROM bookings b
-JOIN events e ON b.event_id = e.event_id
-JOIN seats s ON e.event_id = s.event_id
-WHERE (b.booking_id = 1 AND s.seat_number IN ('VIP-001', 'VIP-002'))
-   OR (b.booking_id = 2 AND s.seat_number IN ('P-001', 'P-002'));
+-- Seats for Hip Hop Live (90 seats)
+INSERT INTO seats (event_id, seat_number, is_booked)
+SELECT 4, CONCAT('D', LPAD(n, 3, '0')), FALSE
+FROM (SELECT ROW_NUMBER() OVER () as n FROM information_schema.tables LIMIT 90) AS seatgen;
 
--- Insert payments
-INSERT INTO payments (booking_id, amount, payment_method, payment_status, transaction_id) VALUES
-(1, 10000.00, 'razorpay', 'captured', 'pay_test123'),
-(2, 7000.00, 'stripe', 'captured', 'ch_test456');
+-- Seats for Indie Vibes Festival (100 seats)
+INSERT INTO seats (event_id, seat_number, is_booked)
+SELECT 5, CONCAT('E', LPAD(n, 3, '0')), FALSE
+FROM (SELECT ROW_NUMBER() OVER () as n FROM information_schema.tables LIMIT 100) AS seatgen;
 
--- Insert event images
+
+
+-- Insert event images with fixed Unsplash URLs
 INSERT INTO event_images (event_id, image_url, is_primary, display_order) VALUES
-(1, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=500', TRUE, 1),
-(1, 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500', FALSE, 2),
-(2, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=500', TRUE, 1),
-(2, 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=500', FALSE, 2),
-(3, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=500', TRUE, 1),
-(3, 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=500', FALSE, 2);
+-- Rock Music Fest (event_id = 1)
+(1, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=500', TRUE, 1),
+(1, 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=500', FALSE, 2),
+
+-- Techno Beats Night (event_id = 2)
+(2, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=500', TRUE, 1),
+(2, 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=500', FALSE, 2),
+
+-- Jazz & Blues Evening (event_id = 3)
+(3, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=500', TRUE, 1),
+(3, 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=500', FALSE, 2),
+
+-- Hip Hop Live (event_id = 4)
+(4, 'https://images.unsplash.com/photo-1440660405495-b26acc5309a2?q=80&w=2070&auto=format&fit=crop&w=500', TRUE, 1),
+(4, 'https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500', FALSE, 2),
+
+-- Indie Vibes Festival (event_id = 5)
+(5, 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=500', TRUE, 1),
+(5, 'https://images.unsplash.com/photo-1515165562835-cb274f35b7b1?auto=format&fit=crop&w=500', FALSE, 2);
+
+
+
+
+
+
