@@ -7,6 +7,9 @@ import Layout from "./components/common/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import About from "./pages/Footer/About";
+import Contact from "./pages/Footer/Contact";
+import Privacy from "./pages/Footer/Privacy";
 import EventsListPage from "./pages/Events/EventsListPage";
 import EventDetailsPage from "./pages/Events/EventDetailsPage";
 import CheckoutPage from "./pages/Events/CheckoutPage";
@@ -39,6 +42,9 @@ export default function App() {
             <Route path="/register" element={<Signup />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/:id" element={<EventDetailsPage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
 
             {/* Protected routes */}
             <Route
