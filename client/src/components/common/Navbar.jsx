@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import EvenzaLogo from "../../../public/EvenzaLogo4crop.png"; // ✅ Your logo image
 
 const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
-  // ✅ Prevent ESLint "no-unused-vars" error for unused function
-  const _handleLogout = () => {
-    onLogout(); // Or add logic here if needed in future
-    navigate("/");
+  const handleLogout = () => {
+    onLogout();
+    navigate("/login");
   };
 
   const getDisplayName = (user) => {
@@ -16,15 +14,22 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-[rgba(8,12,25,1)] shadow-xl">
+    <nav className="bg-gray-900 shadow-xl">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center py-2">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <img src={EvenzaLogo} alt="Evenza Logo" className="h-12 w-auto" />
+          {/* Left: Evenza + Logo */}
+          <Link to="/" className="flex items-center space-x-3 group">
+            <span className="font-semibold text-white text-xl transition duration-300 group-hover:text-indigo-400 border-b-2 border-transparent group-hover:border-indigo-400">
+              Evenza
+            </span>
+            <img
+              src="EvenzaLogo.png"
+              alt="Logo"
+              className="w-10 h-10 rounded-full border-2 border-indigo-500 transition duration-300 group-hover:border-indigo-300"
+            />
           </Link>
 
-          {/* Nav links */}
+          {/* Right: Navigation Links */}
           <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/events"
@@ -67,6 +72,13 @@ const Navbar = ({ user, onLogout }) => {
                     ? "All Events"
                     : "My Bookings"}
                 </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="py-2 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-indigo-500/30"
+                >
+                  Logout
+                </button>
 
                 <Link
                   to={
