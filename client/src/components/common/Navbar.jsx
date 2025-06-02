@@ -1,11 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
+import EvenzaLogo from "../../../public/EvenzaLogo4crop.png"; // ✅ Your logo image
 
 const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    onLogout();
-    navigate("/login");
+  // ✅ Prevent ESLint "no-unused-vars" error for unused function
+  const _handleLogout = () => {
+    onLogout(); // Or add logic here if needed in future
+    navigate("/");
   };
 
   const getDisplayName = (user) => {
@@ -14,21 +16,19 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-gray-900 shadow-xl">
+    <nav className="bg-[rgba(8,12,25,1)] shadow-xl">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          <div className="flex space-x-7">
-            <Link to="/" className="flex items-center py-4 px-2">
-              <span className="font-semibold text-white text-xl hover:text-indigo-400 transition duration-300">
-                Evenza
-              </span>
-            </Link>
-          </div>
+        <div className="flex justify-between items-center py-2">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <img src={EvenzaLogo} alt="Evenza Logo" className="h-12 w-auto" />
+          </Link>
 
-          <div className="hidden md:flex items-center space-x-3">
+          {/* Nav links */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/events"
-              className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+              className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
             >
               Events
             </Link>
@@ -38,7 +38,7 @@ const Navbar = ({ user, onLogout }) => {
                 {user.role === "admin" && (
                   <Link
                     to="/admin/dashboard"
-                    className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                    className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                   >
                     Admin Dashboard
                   </Link>
@@ -46,7 +46,7 @@ const Navbar = ({ user, onLogout }) => {
                 {user.role === "organizer" && (
                   <Link
                     to="/creator/dashboard"
-                    className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                    className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                   >
                     Creator Dashboard
                   </Link>
@@ -59,7 +59,7 @@ const Navbar = ({ user, onLogout }) => {
                       ? "/admin/events"
                       : "/user/bookings"
                   }
-                  className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                  className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                 >
                   {user.role === "organizer"
                     ? "My Events"
@@ -67,12 +67,7 @@ const Navbar = ({ user, onLogout }) => {
                     ? "All Events"
                     : "My Bookings"}
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="py-2 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-indigo-500/30"
-                >
-                  Logout
-                </button>
+
                 <Link
                   to={
                     user.role === "admin"
@@ -81,7 +76,7 @@ const Navbar = ({ user, onLogout }) => {
                       ? "/creator/dashboard"
                       : "/user/dashboard"
                   }
-                  className="py-4 px-2 text-indigo-400 hover:text-indigo-300 transition duration-300 font-medium"
+                  className="py-2 px-3 text-indigo-400 font-medium border-b-2 border-transparent hover:border-indigo-300 hover:text-indigo-300 transition duration-300"
                 >
                   Hi, {getDisplayName(user)}
                 </Link>
@@ -90,7 +85,7 @@ const Navbar = ({ user, onLogout }) => {
               <>
                 <Link
                   to="/login"
-                  className="py-2 px-3 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                  className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                 >
                   Login
                 </Link>
