@@ -44,18 +44,18 @@ function HomePage() {
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
+      name: "Neha Patel",
       role: "Event Organizer",
       content:
         "The platform has revolutionized how we manage our events. Highly recommended!",
-      avatar: "https://i.pravatar.cc/100?img=1",
+      avatar: "https://i.pravatar.cc/100?img=42",
     },
     {
-      name: "Michael Chen",
+      name: "Geeta Sharma",
       role: "Regular Attendee",
       content:
         "I've never had such a smooth experience booking event tickets. Simply amazing!",
-      avatar: "https://i.pravatar.cc/100?img=2",
+      avatar: "https://i.pravatar.cc/100?img=36",
     },
   ];
 

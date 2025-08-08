@@ -34,7 +34,7 @@ module.exports = {
 
       // 3) Check if user still exists
       const [rows] = await db.query(
-        "SELECT user_id, name, email, role FROM users WHERE user_id = ?",
+        "SELECT user_id, name, email, role, is_active FROM users WHERE user_id = ?",
         [decoded.id]
       );
 
@@ -45,6 +45,16 @@ module.exports = {
           new AppError(
             "The user belonging to this token no longer exists.",
             401
+          )
+        );
+      }
+
+      // Block access for deactivated users
+      if (rows[0].is_active === false) {
+        return next(
+          new AppError(
+            "Your account is deactivated. Please contact support.",
+            403
           )
         );
       }

@@ -58,9 +58,11 @@ export default function Bookings() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Manage Bookings</h1>
+    <div className="container mx-auto px-2 py-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          Manage Bookings
+        </h1>
         <div className="flex items-center">
           <label className="flex items-center">
             <input
@@ -80,60 +82,60 @@ export default function Bookings() {
         </div>
       )}
 
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Booking ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Event
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 User
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Amount
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredBookings.map((booking) => (
-              <tr key={booking.booking_id}>
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={booking.booking_id} className="hover:bg-gray-50">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
                     #{booking.booking_id}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {booking.event_title}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {booking.user_name}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs md:text-sm text-gray-500 break-all">
                     {booking.user_email}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     ₹{booking.total_amount}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       booking.status === "confirmed"
@@ -147,22 +149,22 @@ export default function Bookings() {
                       booking.status.slice(1)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {new Date(booking.booking_date).toLocaleDateString()}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs md:text-sm text-gray-500">
                     {new Date(booking.booking_date).toLocaleTimeString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap text-right font-medium space-x-2 md:space-x-4">
                   {booking.status === "pending" && (
                     <>
                       <button
                         onClick={() =>
                           handleStatusChange(booking.booking_id, "confirmed")
                         }
-                        className="text-green-600 hover:text-green-900 mr-4"
+                        className="text-green-600 hover:text-green-900 transition mr-2"
                       >
                         Confirm
                       </button>
@@ -170,7 +172,7 @@ export default function Bookings() {
                         onClick={() =>
                           handleStatusChange(booking.booking_id, "cancelled")
                         }
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 transition"
                       >
                         Cancel
                       </button>
@@ -181,7 +183,7 @@ export default function Bookings() {
                       onClick={() =>
                         handleStatusChange(booking.booking_id, "cancelled")
                       }
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 transition"
                     >
                       Cancel
                     </button>

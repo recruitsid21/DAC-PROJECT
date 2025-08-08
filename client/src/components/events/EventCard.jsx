@@ -1,8 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { useAuth } from "../../context/useAuth";
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, onLoginRequired }) {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   // Check if event is undefined and provide default values or handle errors
   if (!event) {
     return <div>Error: Event data is not available</div>;
@@ -46,12 +49,18 @@ export default function EventCard({ event }) {
           <span className="text-lg font-bold text-gray-900">
             ₹{parseFloat(event.price).toFixed(2)}
           </span>
-          <Link
-            to={`/events/${event.event_id}`}
+          <button
+            onClick={() => {
+              if (!isAuthenticated) {
+                onLoginRequired();
+              } else {
+                navigate(`/events/${event.event_id}`);
+              }
+            }}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700"
           >
             View Details
-          </Link>
+          </button>
         </div>
       </div>
     </div>

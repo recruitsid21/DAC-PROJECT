@@ -44,6 +44,7 @@ router.delete("/users/:id", AdminController.deleteUser);
 // Event management
 router.get("/events", AdminController.getAllEvents);
 router.patch("/events/:id/toggle-status", AdminController.toggleEventStatus);
+router.delete("/events/:id", AdminController.deleteEvent); // Add this route
 
 // Booking management
 router.get("/bookings", AdminController.getAllBookings);

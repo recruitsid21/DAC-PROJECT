@@ -17,7 +17,6 @@ export default function EventDetailsPage() {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [bookingLoading, setBookingLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
@@ -115,74 +114,22 @@ export default function EventDetailsPage() {
     });
   };
 
-  const handleBookNow = async () => {
-    // Check if user is logged in
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      // Save current state to localStorage
-      localStorage.setItem(
-        "bookingRedirect",
-        JSON.stringify({
-          eventId: id,
-          selectedSeats,
-        })
-      );
-      // Redirect to login
-      navigate("/login?redirect=/events/" + id);
-      return;
-    }
-
+  const handleBookNow = () => {
     if (selectedSeats.length === 0) {
       setError("Please select at least one seat");
       return;
     }
-
-    try {
-      setBookingLoading(true);
-      setError("");
-
-      // Calculate total amount
-      const total_amount = selectedSeats.reduce((total, seatId) => {
-        const seat = seats.find((s) => s.seat_id === seatId);
-        return total + (seat ? parseFloat(seat.final_price) : 0);
-      }, 0);
-
-      // Log the request data
-      console.log("Creating booking with:", {
-        event_id: Number(id),
-        seat_ids: selectedSeats,
-        total_amount: parseFloat(total_amount.toFixed(2)),
-      });
-
-      // Create booking
-      const bookingResponse = await api.post("/bookings", {
-        event_id: Number(id),
-        seat_ids: selectedSeats.map(Number),
-        total_amount: parseFloat(total_amount.toFixed(2)),
-      });
-
-      console.log("Booking response:", bookingResponse.data);
-
-      // Redirect to checkout page
-      navigate(`/checkout/${bookingResponse.data.data.booking.booking_id}`);
-    } catch (err) {
-      console.error("Booking error:", err.response?.data || err.message);
-      if (err.response?.status === 401) {
-        // Token expired or invalid, redirect to login
-        localStorage.setItem(
-          "bookingRedirect",
-          JSON.stringify({
-            eventId: id,
-            selectedSeats,
-          })
-        );
-        navigate("/login?redirect=/events/" + id);
-      } else {
-        setError(err.response?.data?.message || "Failed to create booking");
-      }
-    } finally {
-      setBookingLoading(false);
-    }
+    // Pass eventId and selectedSeats to CheckoutPage via navigation state
+    console.log("Navigating to /checkout with:", {
+      eventId: id,
+      selectedSeats,
+    });
+    navigate("/checkout", {
+      state: {
+        eventId: id,
+        selectedSeats,
+      },
+    });
   };
 
   const handleWishlist = async () => {
@@ -268,11 +215,39 @@ export default function EventDetailsPage() {
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg md:w-64">
-              <div className="text-xl font-bold text-gray-900 mb-2">
-                ₹
-                {event.price && !isNaN(event.price)
-                  ? parseFloat(event.price).toFixed(2)
-                  : "N/A"}
+              <div className="space-y-3 mb-4">
+                <div className="text-lg font-bold text-gray-900">
+                  Seat Pricing:
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-green-600">Regular:</span>
+                    <span className="font-medium">
+                      ₹
+                      {event.price && !isNaN(event.price)
+                        ? parseFloat(event.price).toFixed(2)
+                        : "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-purple-600">VIP:</span>
+                    <span className="font-medium">
+                      ₹
+                      {event.price && !isNaN(event.price)
+                        ? (parseFloat(event.price) * 1.5).toFixed(2)
+                        : "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-amber-600">Premium:</span>
+                    <span className="font-medium">
+                      ₹
+                      {event.price && !isNaN(event.price)
+                        ? (parseFloat(event.price) * 2).toFixed(2)
+                        : "N/A"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="text-sm text-gray-600 mb-4">
@@ -299,14 +274,14 @@ export default function EventDetailsPage() {
               )}
               <button
                 onClick={handleBookNow}
-                disabled={bookingLoading || selectedSeats.length === 0}
+                disabled={selectedSeats.length === 0}
                 className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                  bookingLoading || selectedSeats.length === 0
+                  selectedSeats.length === 0
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
               >
-                {bookingLoading ? "Processing..." : "Book Now"}
+                {selectedSeats.length === 0 ? "Select Seats" : "Book Now"}
               </button>
             </div>
           </div>

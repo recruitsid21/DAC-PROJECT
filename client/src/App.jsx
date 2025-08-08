@@ -7,6 +7,8 @@ import Layout from "./components/common/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/Footer/About";
 import Contact from "./pages/Footer/Contact";
 import Privacy from "./pages/Footer/Privacy";
@@ -40,6 +42,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/:id" element={<EventDetailsPage />} />
             <Route path="/about" element={<About />} />
@@ -47,6 +51,14 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
 
             {/* Protected routes */}
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/checkout/:bookingId"
               element={

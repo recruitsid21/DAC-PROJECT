@@ -1,8 +1,9 @@
 import React from "react";
+import RightsFooter from "../../components/rights/RightsFooter";
 
 const Contact = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-12 flex flex-col justify-between">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow-lg rounded-lg p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Contact Us</h1>
@@ -34,11 +35,8 @@ const Contact = () => {
                 </p>
                 <p>
                   <span className="font-medium">Phone:</span>{" "}
-                  <a
-                    href="tel:+1-555-0123"
-                    className="text-indigo-600 hover:text-indigo-500"
-                  >
-                    +1 (555) 0123
+                  <a href="#" className="text-indigo-600 hover:text-indigo-500">
+                    +91 8279600521
                   </a>
                 </p>
                 <p>
@@ -50,6 +48,9 @@ const Contact = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer Rights Section */}
+      <RightsFooter />
     </div>
   );
 };

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = ({ user, onLogout }) => {
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,21 +17,62 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-gray-900 shadow-xl">
+    <nav className="bg-[rgba(8,12,25,1)] shadow-xl">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          <div className="flex space-x-7">
-            <Link to="/" className="flex items-center py-4 px-2">
-              <span className="font-semibold text-white text-xl hover:text-indigo-400 transition duration-300">
-                Evenza
-              </span>
-            </Link>
+        <div className="flex justify-between items-center py-2">
+          {/* Logo with error handling */}
+          <Link to="/" className="flex items-center">
+            <img
+              src="/EvenzaLogo4crop.png" // Add leading slash for absolute path from public directory
+              alt="Evenza"
+              className="w-30 h-12 transition duration-300"
+              onError={(e) => {
+                if (!logoError) {
+                  // Try alternate path if first one fails
+                  e.target.src = "EvenzaLogo4crop.png";
+                  setLogoError(true);
+                }
+              }}
+            />
+          </Link>
+
+          {/* Hamburger Menu - Only shows on mobile */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-300 hover:text-white focus:outline-none"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
 
-          <div className="hidden md:flex items-center space-x-3">
+          {/* Right: Navigation Links (desktop) */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/events"
-              className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+              className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
             >
               Events
             </Link>
@@ -38,7 +82,7 @@ const Navbar = ({ user, onLogout }) => {
                 {user.role === "admin" && (
                   <Link
                     to="/admin/dashboard"
-                    className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                    className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                   >
                     Admin Dashboard
                   </Link>
@@ -46,7 +90,7 @@ const Navbar = ({ user, onLogout }) => {
                 {user.role === "organizer" && (
                   <Link
                     to="/creator/dashboard"
-                    className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                    className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                   >
                     Creator Dashboard
                   </Link>
@@ -59,7 +103,7 @@ const Navbar = ({ user, onLogout }) => {
                       ? "/admin/events"
                       : "/user/bookings"
                   }
-                  className="py-4 px-2 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                  className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                 >
                   {user.role === "organizer"
                     ? "My Events"
@@ -67,12 +111,14 @@ const Navbar = ({ user, onLogout }) => {
                     ? "All Events"
                     : "My Bookings"}
                 </Link>
+
                 <button
                   onClick={handleLogout}
                   className="py-2 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg hover:shadow-indigo-500/30"
                 >
                   Logout
                 </button>
+
                 <Link
                   to={
                     user.role === "admin"
@@ -81,7 +127,7 @@ const Navbar = ({ user, onLogout }) => {
                       ? "/creator/dashboard"
                       : "/user/dashboard"
                   }
-                  className="py-4 px-2 text-indigo-400 hover:text-indigo-300 transition duration-300 font-medium"
+                  className="py-2 px-3 text-indigo-400 font-medium border-b-2 border-transparent hover:border-indigo-300 hover:text-indigo-300 transition duration-300"
                 >
                   Hi, {getDisplayName(user)}
                 </Link>
@@ -90,7 +136,7 @@ const Navbar = ({ user, onLogout }) => {
               <>
                 <Link
                   to="/login"
-                  className="py-2 px-3 text-gray-300 font-medium hover:text-indigo-400 transition duration-300"
+                  className="py-2 px-3 text-gray-300 font-medium border-b-2 border-transparent hover:border-indigo-400 hover:text-indigo-400 transition duration-300"
                 >
                   Login
                 </Link>
@@ -104,6 +150,90 @@ const Navbar = ({ user, onLogout }) => {
             )}
           </div>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden flex flex-col space-y-2 mt-2">
+            <Link
+              to="/events"
+              className="text-gray-300 hover:text-indigo-400 px-2"
+            >
+              Events
+            </Link>
+
+            {user ? (
+              <>
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="text-gray-300 hover:text-indigo-400 px-2"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
+                {user.role === "organizer" && (
+                  <Link
+                    to="/creator/dashboard"
+                    className="text-gray-300 hover:text-indigo-400 px-2"
+                  >
+                    Creator Dashboard
+                  </Link>
+                )}
+                <Link
+                  to={
+                    user.role === "organizer"
+                      ? "/creator/events"
+                      : user.role === "admin"
+                      ? "/admin/events"
+                      : "/user/bookings"
+                  }
+                  className="text-gray-300 hover:text-indigo-400 px-2"
+                >
+                  {user.role === "organizer"
+                    ? "My Events"
+                    : user.role === "admin"
+                    ? "All Events"
+                    : "My Bookings"}
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="bg-indigo-600 text-white font-medium rounded-lg py-1 px-3 mx-2 hover:bg-indigo-700 transition duration-300"
+                >
+                  Logout
+                </button>
+
+                <Link
+                  to={
+                    user.role === "admin"
+                      ? "/admin/dashboard"
+                      : user.role === "organizer"
+                      ? "/creator/dashboard"
+                      : "/user/dashboard"
+                  }
+                  className="text-indigo-400 px-2"
+                >
+                  Hi, {getDisplayName(user)}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-gray-300 hover:text-indigo-400 px-2"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-indigo-600 text-white font-medium rounded-lg py-1 px-3 mx-2 hover:bg-indigo-700 transition duration-300"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );

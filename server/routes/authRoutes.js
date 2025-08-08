@@ -5,7 +5,9 @@ const { protect } = require("../middlewares/authMiddleware");
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
-router.post("/logout", protect, AuthController.logout);
+router.post("/forgot-password", AuthController.forgotPassword);
+router.post("/send-reset-email", AuthController.sendResetEmail); // For email functionality later
+router.patch("/reset-password/:token", AuthController.resetPassword);
 router.post("/refresh-token", AuthController.refreshToken);
 
 // Protected routes

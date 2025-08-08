@@ -288,16 +288,18 @@ class CreatorController {
 
       // Get upcoming events
       const [upcomingEvents] = await db.query(
-        `SELECT e.*, 
-          COUNT(DISTINCT b.booking_id) as booking_count,
-          COUNT(DISTINCT w.wishlist_id) as wishlist_count
-         FROM events e
-         LEFT JOIN bookings b ON e.event_id = b.event_id AND b.status = 'confirmed'
-         LEFT JOIN wishlists w ON e.event_id = w.event_id
-         WHERE e.organizer_id = ? AND e.date >= CURDATE()
-         GROUP BY e.event_id
-         ORDER BY e.date ASC
-         LIMIT 5`,
+        `SELECT 
+          e.*,
+          (SELECT COUNT(*) FROM bookings b 
+           JOIN booked_seats bs ON b.booking_id = bs.booking_id 
+           WHERE b.event_id = e.event_id AND b.status = 'confirmed') as booked_seats,
+          (SELECT COUNT(DISTINCT b.booking_id) FROM bookings b 
+           WHERE b.event_id = e.event_id AND b.status = 'confirmed') as confirmed_bookings
+        FROM events e
+        WHERE e.organizer_id = ? 
+        AND e.date >= CURDATE()
+        ORDER BY e.date ASC
+        LIMIT 5`,
         [req.user.user_id]
       );
 
@@ -438,41 +440,103 @@ class CreatorController {
   }
 
   static async deleteEvent(req, res, next) {
+    const connection = await db.getConnection();
     try {
+      await connection.beginTransaction();
+
       // Check if event exists and belongs to this organizer
-      const [event] = await db.query(
-        "SELECT event_id FROM events WHERE event_id = ? AND organizer_id = ?",
+      const [event] = await connection.query(
+        "SELECT event_id, total_seats, available_seats FROM events WHERE event_id = ? AND organizer_id = ?",
         [req.params.id, req.user.user_id]
       );
 
       if (!event.length) {
+        await connection.rollback();
+        connection.release();
         return next(new AppError("No event found with that ID", 404));
       }
 
-      // Check if event has any confirmed bookings
-      const [bookings] = await db.query(
-        'SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status = "confirmed"',
+      // Check for any active (non-cancelled) bookings
+      const [activeBookings] = await connection.query(
+        'SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status != "cancelled"',
         [req.params.id]
       );
 
-      if (bookings[0].count > 0) {
+      if (activeBookings[0].count > 0 && event[0].available_seats < event[0].total_seats) {
+        await connection.rollback();
+        connection.release();
         return next(
           new AppError(
-            "Cannot delete event with confirmed bookings. Please cancel all bookings first.",
+            "Cannot delete event with active bookings. Please cancel all bookings first.",
             400
           )
         );
       }
 
-      // Delete event (this will cascade delete related records due to foreign key constraints)
-      await db.query("DELETE FROM events WHERE event_id = ?", [req.params.id]);
+      try {
+        // First, get all booking IDs for this event
+        const [bookings] = await connection.query(
+          "SELECT booking_id FROM bookings WHERE event_id = ?",
+          [req.params.id]
+        );
 
-      res.status(200).json({
-        status: "success",
-        message: "Event deleted successfully",
-      });
+        // Delete payments first (they reference bookings)
+        for (const booking of bookings) {
+          await connection.query(
+            "DELETE FROM payments WHERE booking_id = ?",
+            [booking.booking_id]
+          );
+        }
+
+        // Then delete booked seats
+        await connection.query(
+          `DELETE bs FROM booked_seats bs 
+           INNER JOIN bookings b ON bs.booking_id = b.booking_id 
+           WHERE b.event_id = ?`,
+          [req.params.id]
+        );
+
+        // Then delete bookings
+        await connection.query(
+          "DELETE FROM bookings WHERE event_id = ?",
+          [req.params.id]
+        );
+
+        // Delete seats
+        await connection.query(
+          "DELETE FROM seats WHERE event_id = ?",
+          [req.params.id]
+        );
+
+        // Finally delete the event
+        await connection.query(
+          "DELETE FROM events WHERE event_id = ?",
+          [req.params.id]
+        );
+
+        await connection.commit();
+
+        res.status(200).json({
+          status: "success",
+          message: "Event deleted successfully",
+        });
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      }
     } catch (err) {
+      if (connection) {
+        try {
+          await connection.rollback();
+        } catch (rollbackError) {
+          console.error('Error rolling back transaction:', rollbackError);
+        }
+      }
       next(err);
+    } finally {
+      if (connection) {
+        connection.release();
+      }
     }
   }
 }

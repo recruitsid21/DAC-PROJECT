@@ -6,6 +6,7 @@ const { validateEventData } = require("../middlewares/eventValidation");
 const upload = require("../utils/multer");
 
 router.get("/", EventController.getAllEvents);
+router.get("/:id/seats", EventController.getEventSeats);
 router.get("/:id", EventController.getEvent);
 
 // Protected routes
@@ -24,8 +25,7 @@ router.put(
 );
 router.delete("/:id", EventController.deleteEvent);
 
-// Event seats
-router.get("/:id/seats", EventController.getEventSeats);
+// Event seats (protected)
 router.post("/:id/seats", EventController.addSeats);
 
 // Event images

@@ -38,11 +38,11 @@ INSERT INTO categories (name, description, image_url, is_active) VALUES
 -- Insert sample events (MAX SEATS: 100)
 INSERT INTO events (title, description, short_description, date, time, end_date, end_time, location, venue_details, capacity, total_seats, available_seats, price, category_id, organizer_id, is_active, image_url)
 VALUES
-('Rock Music Fest', 'An electrifying rock concert', 'Rock concert with popular bands', '2025-06-15', '19:00:00', '2025-06-15', '22:00:00', 'Mumbai Arena', 'Gate 3, Sector 5', 100, 100, 100, 500.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=500'),
-('Techno Beats Night', 'Dance the night away with techno vibes', 'Techno music with top DJs', '2025-07-10', '20:00:00', '2025-07-10', '23:30:00', 'Bangalore Club', 'Hall A, 2nd Floor', 80, 80, 80, 600.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=500'),
-('Jazz & Blues Evening', 'Smooth jazz and blues session', 'Evening of live jazz music', '2025-06-22', '18:00:00', '2025-06-22', '21:00:00', 'Kolkata Auditorium', 'Main Hall', 50, 50, 50, 450.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=500'),
-('Hip Hop Live', 'Live hip hop performances', 'Hip hop concert', '2025-08-05', '19:30:00', '2025-08-05', '22:30:00', 'Delhi Grounds', 'Open Stage Area', 90, 90, 90, 700.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1440660405495-b26acc5309a2?q=80&w=2070&auto=format&fit=crop&w=500'),
-('Indie Vibes Festival', 'Celebrate Indie music', 'Indie bands and artists', '2025-07-25', '17:00:00', '2025-07-25', '21:00:00', 'Hyderabad Arena', 'South Wing', 100, 100, 100, 400.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=500');
+('Rock Music Fest', 'An electrifying rock concert', 'Rock concert with popular bands', '2025-10-23', '08:15:30', '2025-10-23', '11:15:30', 'Mumbai Arena', 'Gate 3, Sector 5', 100, 100, 100, 500.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=500'),
+('Techno Beats Night', 'Dance the night away with techno vibes', 'Techno music with top DJs', '2025-11-01', '08:15:30', '2025-11-01', '11:15:30', 'Bangalore Club', 'Hall A, 2nd Floor', 80, 80, 80, 600.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=500'),
+('Jazz & Blues Evening', 'Smooth jazz and blues session', 'Evening of live jazz music', '2025-09-19', '08:15:30', '2025-09-19', '11:15:30', 'Kolkata Auditorium', 'Main Hall', 50, 50, 50, 450.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=500'),
+('Hip Hop Live', 'Live hip hop performances', 'Hip hop concert', '2025-09-26', '08:15:30', '2025-09-26', '11:15:30', 'Delhi Grounds', 'Open Stage Area', 90, 90, 90, 700.00, 1, 3, TRUE, 'https://images.unsplash.com/photo-1440660405495-b26acc5309a2?q=80&w=2070&auto=format&fit=crop&w=500'),
+('Indie Vibes Festival', 'Celebrate Indie music', 'Indie bands and artists', '2025-10-06', '08:15:30', '2025-10-06', '11:15:30', 'Hyderabad Arena', 'South Wing', 100, 100, 100, 400.00, 1, 2, TRUE, 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=500');
 
 
 -- Insert seats for events
@@ -96,9 +96,5 @@ INSERT INTO event_images (event_id, image_url, is_primary, display_order) VALUES
 -- Indie Vibes Festival (event_id = 5)
 (5, 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=500', TRUE, 1),
 (5, 'https://images.unsplash.com/photo-1515165562835-cb274f35b7b1?auto=format&fit=crop&w=500', FALSE, 2);
-
-
-
-
 
 

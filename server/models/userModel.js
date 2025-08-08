@@ -2,6 +2,7 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET, JWT_EXPIRES_IN, REFRESH_TOKEN_EXPIRES_IN } = process.env;
+const crypto = require("crypto");
 
 class User {
   static async findByEmail(email) {
@@ -9,6 +10,9 @@ class User {
       "SELECT user_id, name, email, password, phone, role, is_active, failed_login_attempts, lockout_time FROM users WHERE email = ?",
       [email]
     );
+    if (rows[0]) {
+      rows[0].is_active = !!rows[0].is_active;
+    }
     return rows[0];
   }
 
@@ -17,6 +21,9 @@ class User {
       "SELECT user_id, name, email, password, phone, role, is_active, failed_login_attempts, lockout_time FROM users WHERE user_id = ?",
       [id]
     );
+    if (rows[0]) {
+      rows[0].is_active = !!rows[0].is_active;
+    }
     return rows[0];
   }
 
@@ -110,8 +117,40 @@ class User {
 
   static async resetFailedLoginAttempts(email) {
     await db.query(
-      "UPDATE users SET failed_login_attempts = 0, lockout_time = NULL WHERE email = ?",
+      "UPDATE users SET failed_login_attempts = 0 WHERE email = ?",
       [email]
+    );
+  }
+
+  static async createPasswordResetToken() {
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    return resetToken;
+  }
+
+  static async savePasswordResetToken(userId, resetToken) {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    await db.query(
+      "UPDATE users SET reset_token = ?, reset_token_expiry = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE user_id = ?",
+      [hashedToken, userId]
+    );
+  }
+
+  static async findByPasswordResetToken(hashedToken) {
+    const [rows] = await db.query(
+      "SELECT user_id, name, email, password, phone, role, is_active FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()",
+      [hashedToken]
+    );
+    return rows[0];
+  }
+
+  static async updatePassword(userId, hashedPassword) {
+    await db.query(
+      "UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE user_id = ?",
+      [hashedPassword, userId]
     );
   }
 

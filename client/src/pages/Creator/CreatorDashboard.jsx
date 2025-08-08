@@ -19,8 +19,24 @@ export default function CreatorDashboard() {
       try {
         const response = await api.get("/creator/stats");
         setStats(response.data.data.stats);
-        setRecentEvents(response.data.data.upcomingEvents || []);
+        const events = response.data.data.upcomingEvents || [];
+
+        const processedEvents = events.map((event) => ({
+          ...event,
+          // Use the actual booked_seats count from the server
+          booked_seats: parseInt(event.booked_seats) || 0,
+          total_seats: parseInt(event.total_seats) || 0,
+          booking_percentage: event.total_seats
+            ? ((parseInt(event.booked_seats) || 0) /
+                parseInt(event.total_seats)) *
+              100
+            : 0,
+        }));
+
+        console.log("Processed events:", processedEvents); // For debugging
+        setRecentEvents(processedEvents);
       } catch (err) {
+        console.error("Stats fetch error:", err);
         setError(err.response?.data?.message || "Failed to fetch statistics");
       } finally {
         setLoading(false);
@@ -98,8 +114,7 @@ export default function CreatorDashboard() {
                   </p>
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-sm text-gray-500">
-                      {event.booking_count || 0}/{event.total_seats} seats
-                      booked
+                      {event.booked_seats}/{event.total_seats} seats booked
                     </span>
                     <span className="text-sm font-medium text-indigo-600">
                       View Details →

@@ -96,6 +96,12 @@ export default function MyEvents() {
                     >
                       View
                     </Link>
+                    <Link
+                      to={`/creator/events/${event.event_id}/edit`}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+                    >
+                      Edit
+                    </Link>
                     <button
                       onClick={() => handleDelete(event.event_id)}
                       className="px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200"

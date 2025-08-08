@@ -182,21 +182,39 @@ export default function EventInsightPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Seat Distribution
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto">
             {Object.entries(event.seat_distribution).map(([type, stats]) => (
-              <div key={type} className="bg-white rounded-lg border p-4">
-                <h3 className="font-medium text-gray-900 capitalize mb-2">
+              <div
+                key={type}
+                className="bg-white rounded-lg border p-4 flex-shrink-0"
+              >
+                <h3 className="font-medium text-gray-900 capitalize mb-2 truncate">
                   {type} Seats
                 </h3>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Total: {stats.total}</span>
-                  <span>Booked: {stats.booked}</span>
-                  <span>Available: {stats.available}</span>
+                <div className="flex flex-col space-y-1">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span className="whitespace-nowrap">Total:</span>
+                    <span className="ml-2">{stats.total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span className="whitespace-nowrap">Booked:</span>
+                    <span className="ml-2">
+                      {stats.booked.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span className="whitespace-nowrap">Available:</span>
+                    <span className="ml-2">
+                      {stats.available.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-2 h-2 bg-gray-200 rounded">
+                <div className="mt-2 h-2 bg-gray-200 rounded overflow-hidden">
                   <div
-                    className="h-2 bg-indigo-600 rounded"
-                    style={{ width: `${(stats.booked / stats.total) * 100}%` }}
+                    className="h-full bg-indigo-600 rounded transition-all duration-300"
+                    style={{
+                      width: `${(stats.booked / stats.total) * 100}%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -272,19 +290,18 @@ export default function EventInsightPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Recent Bookings
             </h2>
-            <div className="space-y-4">
-              {" "}
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
               {bookingHistory.slice(0, 5).map((booking) => (
                 <div
                   key={booking.booking_id}
-                  className="flex justify-between items-center border-b border-gray-200 pb-2"
+                  className="flex justify-between items-start border-b border-gray-200 pb-2"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900">
+                  <div className="flex-1 min-w-0 pr-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-gray-900 truncate">
                         Booking #{booking.booking_id}
                       </p>
-                      <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                      <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded truncate">
                         {booking.user_name}
                       </span>
                     </div>
@@ -295,19 +312,19 @@ export default function EventInsightPage() {
                       )}
                     </p>
                     {booking.booked_seats && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Seats: {booking.booked_seats}
+                      <p className="text-xs text-gray-500 mt-1 break-words">
+                        Seats:{" "}
+                        {Array.isArray(booking.booked_seats)
+                          ? booking.booked_seats.join(", ")
+                          : booking.booked_seats}
                       </p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-green-600">
-                      ₹
-                      {Number(booking.total_amount).toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                      })}
+                  <div className="text-right flex-shrink-0">
+                    <p className="font-medium text-green-600 whitespace-nowrap">
+                      ₹{Number(booking.total_amount).toLocaleString("en-IN")}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 truncate max-w-[150px]">
                       {booking.user_email}
                     </p>
                   </div>

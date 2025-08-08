@@ -34,6 +34,30 @@ export default function Events() {
     }
   };
 
+  const handleDelete = async (eventId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this event? This will delete all related bookings, seats, and other data."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.delete(`/admin/events/${eventId}`);
+      toast.success("Event deleted successfully!");
+      fetchEvents(); // Refresh the events list
+    } catch (err) {
+      console.error("Delete error:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to delete event";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -43,8 +67,10 @@ export default function Events() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Manage Events</h1>
+    <div className="container mx-auto px-2 py-8">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
+        Manage Events
+      </h1>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -52,71 +78,71 @@ export default function Events() {
         </div>
       )}
 
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Event
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Organizer
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Category
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-3 md:px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {events.map((event) => (
-              <tr key={event.event_id}>
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={event.event_id} className="hover:bg-gray-50">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     {event.image_url && (
                       <img
                         src={event.image_url}
                         alt={event.title}
-                        className="h-10 w-10 rounded-full mr-3 object-cover"
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-full mr-2 md:mr-3 object-cover"
                       />
                     )}
                     <div>
                       <div className="text-sm font-medium text-gray-900">
                         {event.title}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-xs md:text-sm text-gray-500">
                         {event.short_description}
                       </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {event.organizer_name}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {event.category_name}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {new Date(event.date).toLocaleDateString()}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs md:text-sm text-gray-500">
                     {new Date(event.date).toLocaleTimeString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       event.is_active
@@ -127,10 +153,10 @@ export default function Events() {
                     {event.is_active ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-3 md:px-6 py-4 whitespace-nowrap text-right font-medium space-x-2 md:space-x-4">
                   <button
                     onClick={() => handleToggleStatus(event.event_id)}
-                    className="text-yellow-600 hover:text-yellow-900 mr-4"
+                    className="text-yellow-600 hover:text-yellow-900 transition"
                   >
                     {event.is_active ? "Deactivate" : "Activate"}
                   </button>
@@ -138,10 +164,16 @@ export default function Events() {
                     href={`/events/${event.event_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-indigo-600 hover:text-indigo-900 transition"
                   >
                     View
                   </a>
+                  <button
+                    onClick={() => handleDelete(event.event_id)}
+                    className="text-red-600 hover:text-red-900 transition"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
