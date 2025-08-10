@@ -11,11 +11,33 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Regex patterns
+  const nameRegex = /^[A-Za-z\s]{3,50}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+  const phoneRegex = /^\d{10}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    // Frontend validations
+    if (!nameRegex.test(name)) {
+      return setError("Name must be 3-50 letters only.");
+    }
+    if (!emailRegex.test(email)) {
+      return setError("Invalid email address.");
+    }
+    if (!passwordRegex.test(password)) {
+      return setError(
+        "Password must be at least 6 characters, with 1 letter & 1 number."
+      );
+    }
+    if (phone && !phoneRegex.test(phone)) {
+      return setError("Phone number must be exactly 10 digits.");
+    }
+
+    setLoading(true);
     try {
       await api.post("/auth/register", { name, email, password, phone });
       navigate("/login?registered=true");
@@ -90,7 +112,6 @@ export default function Signup() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password (min 6 characters)"
-                minLength="6"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

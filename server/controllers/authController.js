@@ -9,6 +9,32 @@ class AuthController {
   static async register(req, res, next) {
     try {
       const { name, email, password, phone } = req.body;
+      // Regex patterns (same as frontend)
+      const nameRegex = /^[A-Za-z\s]{3,50}$/;
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      // Validations
+      if (!nameRegex.test(name)) {
+        return next(new AppError("Name must be 3-50 letters only.", 400));
+      }
+      if (!emailRegex.test(email)) {
+        return next(new AppError("Please provide a valid email address", 400));
+      }
+      if (!passwordRegex.test(password)) {
+        return next(
+          new AppError(
+            "Password must be at least 6 characters, with 1 letter & 1 number.",
+            400
+          )
+        );
+      }
+      if (phone && !phoneRegex.test(phone)) {
+        return next(
+          new AppError("Phone number must be exactly 10 digits.", 400)
+        );
+      }
 
       // Check if user already exists
       const existingUser = await User.findByEmail(email);
