@@ -100,13 +100,17 @@ class AuthController {
         );
       }
 
+      // Code for at max 5 login attempts before locking account
       if (!user || !(await User.comparePassword(password, user.password))) {
+        const maxAttempts = 5;
+        const currentAttempts = user?.failed_login_attempts || 0;
+        const attemptsLeft = maxAttempts - (currentAttempts + 1);
+
         // Increment failed login attempts
         await User.incrementFailedLoginAttempts(email);
 
-        // Check if account should be locked
-        const updatedUser = await User.findByEmail(email);
-        if (updatedUser && updatedUser.failed_login_attempts >= 5) {
+        // Lock account if no attempts left
+        if (attemptsLeft <= 0) {
           await User.lockAccount(email);
           return next(
             new AppError(
@@ -116,7 +120,15 @@ class AuthController {
           );
         }
 
-        return next(new AppError("Incorrect email or password", 401));
+        // Show how many tries are left
+        return next(
+          new AppError(
+            `Incorrect email or password. You have ${attemptsLeft} attempt${
+              attemptsLeft > 1 ? "s" : ""
+            } left.`,
+            401
+          )
+        );
       }
 
       // 3) Check if account is locked
