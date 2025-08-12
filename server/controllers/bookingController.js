@@ -1,7 +1,11 @@
 const Booking = require("../models/bookingModel");
 const Event = require("../models/eventModel");
+const User = require("../models/userModel");
 const AppError = require("../utils/appError");
+const EmailService = require("../services/emailService");
 const db = require("../config/db");
+
+const emailService = new EmailService();
 
 class BookingController {
   static async createBooking(req, res, next) {
@@ -65,6 +69,24 @@ class BookingController {
       // 8) Get booking details with seats
       const booking = await Booking.findById(bookingId);
       const bookedSeats = await Booking.getBookedSeats(bookingId);
+
+      // 9) Send booking confirmation email
+      try {
+        const user = await User.findById(req.user.user_id);
+        const event = await Event.findById(event_id);
+
+        if (user && event) {
+          await emailService.sendBookingConfirmation(
+            user,
+            booking,
+            event,
+            bookedSeats
+          );
+        }
+      } catch (emailError) {
+        console.error("Failed to send booking confirmation email:", emailError);
+        // Don't fail the booking if email fails
+      }
 
       res.status(201).json({
         status: "success",
@@ -225,6 +247,22 @@ class BookingController {
         // Commit transaction
         await db.query("COMMIT");
 
+        // Send booking cancellation email
+        try {
+          const user = await User.findById(booking.user_id);
+          const event = await Event.findById(booking.event_id);
+
+          if (user && event) {
+            await emailService.sendBookingCancellation(user, booking, event);
+          }
+        } catch (emailError) {
+          console.error(
+            "Failed to send booking cancellation email:",
+            emailError
+          );
+          // Don't fail the cancellation if email fails
+        }
+
         res.status(200).json({
           status: "success",
           message: "Booking cancelled successfully",
@@ -269,6 +307,32 @@ class BookingController {
         data: {
           booking: updatedBooking,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // New method to send event reminder email
+  static async sendEventReminder(req, res, next) {
+    try {
+      const { bookingId } = req.params;
+
+      const booking = await Booking.findById(bookingId);
+      if (!booking) {
+        return next(new AppError("No booking found with that ID", 404));
+      }
+
+      const user = await User.findById(booking.user_id);
+      const event = await Event.findById(booking.event_id);
+
+      if (user && event) {
+        await emailService.sendEventReminder(user, booking, event);
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Event reminder email sent successfully",
       });
     } catch (err) {
       next(err);

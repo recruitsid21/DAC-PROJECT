@@ -48,6 +48,27 @@ class AuthController {
       // Get the user data
       const user = await User.findById(userId);
 
+      // Send welcome email
+      try {
+        const EmailService = require("../services/emailService");
+        const WelcomeMessage = require("../models/welcomeMessageModel");
+        const emailService = new EmailService();
+
+        // Get welcome message with featured events using the proper model
+        const welcomeData = await WelcomeMessage.getWelcomeMessageWithEvents(
+          userId
+        );
+
+        await emailService.sendEnhancedWelcomeEmail(
+          user,
+          welcomeData.featuredEvents
+        );
+        console.log("Welcome email sent to:", user.email);
+      } catch (emailError) {
+        console.error("Error sending welcome email:", emailError);
+        // Don't fail registration if email fails
+      }
+
       // Generate tokens
       const { token, refreshToken } = await User.generateAuthToken(user);
 
@@ -333,7 +354,7 @@ class AuthController {
   static async forgotPassword(req, res, next) {
     try {
       console.log("Forgot password request received:", req.body);
-      const { email } = req.body;
+      const { email, generateOnly } = req.body; // flag from frontend if only generating link
 
       // 1) Get user based on email
       const user = await User.findByEmail(email);
@@ -351,21 +372,30 @@ class AuthController {
       await User.savePasswordResetToken(user.user_id, resetToken);
       console.log("Reset token saved to database");
 
-      // 3) Send it to user's email
+      // 3) Prepare reset URL
       const resetURL = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
 
-      try {
-        // For development, just log the reset URL instead of sending email
-        console.log("Password reset URL:", resetURL);
+      // 4) If just generating link for developer (no email)
+      if (generateOnly) {
+        console.log(
+          "Generate-only mode: Returning reset URL without sending email"
+        );
+        return res.status(200).json({
+          status: "success",
+          resetURL,
+        });
+      }
 
-        // Uncomment the line below when email is properly configured
-        // await require("../utils/email").sendPasswordResetEmail(user, resetURL);
+      // 5) Otherwise, send it to user's email
+      try {
+        const EmailService = require("../services/emailService");
+        const emailService = new EmailService();
+
+        await emailService.sendPasswordResetEmail(user, resetToken);
 
         res.status(200).json({
           status: "success",
-          message: "Password reset token sent to email",
-          // For development, include the reset URL in response
-          resetURL: resetURL,
+          message: "Password reset email sent successfully",
         });
       } catch (err) {
         console.error("Email sending error:", err);
@@ -403,7 +433,17 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(newPassword, 12);
       await User.updatePassword(user.user_id, hashedPassword);
 
-      // 4) Log the user in, send JWT
+      // 4) Send password reset confirmation email
+      try {
+        const EmailService = require("../services/emailService");
+        const emailService = new EmailService();
+        await emailService.sendPasswordResetConfirmation(user);
+      } catch (emailError) {
+        console.error("Error sending password reset confirmation:", emailError);
+        // Don't fail the request if email fails
+      }
+
+      // 5) Log the user in, send JWT
       const { token, refreshToken } = await User.generateAuthToken(user);
 
       // Set refresh token as HTTP-only cookie
@@ -416,6 +456,7 @@ class AuthController {
 
       res.status(200).json({
         status: "success",
+        message: "Password reset successful",
         data: {
           token,
         },
@@ -429,9 +470,12 @@ class AuthController {
   static async sendResetEmail(req, res, next) {
     try {
       const { email } = req.body;
+      console.log("Send reset email request received:", req.body);
 
       // 1) Get user based on email
       const user = await User.findByEmail(email);
+      console.log("User found:", user ? "Yes" : "No");
+
       if (!user) {
         return next(
           new AppError("There is no user with this email address", 404)
@@ -440,13 +484,21 @@ class AuthController {
 
       // 2) Generate random reset token
       const resetToken = await User.createPasswordResetToken();
+      console.log("Reset token generated:", resetToken ? "Yes" : "No");
       await User.savePasswordResetToken(user.user_id, resetToken);
+      console.log("Reset token saved to database");
 
       // 3) Send it to user's email
-      const resetURL = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
+      const resetURL = `${req.protocol}://${req.get(
+        "host"
+      )}/reset-password/${resetToken}`;
 
       try {
-        await require("../utils/email").sendPasswordResetEmail(user, resetURL);
+        const EmailService = require("../services/emailService");
+        const emailService = new EmailService();
+
+        await emailService.sendPasswordResetEmail(user, resetToken);
+
         res.status(200).json({
           status: "success",
           message: "Password reset email sent successfully",

@@ -143,6 +143,18 @@ CREATE TABLE wishlists (
 CREATE INDEX idx_wishlist_user ON wishlists(user_id);
 CREATE INDEX idx_wishlist_event ON wishlists(event_id);
 
+-- Welcome messages table
+CREATE TABLE welcome_messages (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('welcome', 'custom', 'promotional') DEFAULT 'welcome',
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- Refresh tokens table with enhanced security
 CREATE TABLE refresh_tokens (
     token_id INT PRIMARY KEY AUTO_INCREMENT,
