@@ -99,9 +99,7 @@ class EmailService {
 
   // Booking confirmation email
   async sendBookingConfirmation(user, booking, event, seats) {
-    const seatsList = seats
-      .map((seat) => `Row ${seat.row_number}, Seat ${seat.seat_number}`)
-      .join(", ");
+    const seatsList = seats.map((seat) => `${seat.seat_number}`).join(", ");
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -116,7 +114,7 @@ class EmailService {
           <p><strong>Location:</strong> ${event.location}</p>
           <p><strong>Seats:</strong> ${seatsList}</p>
           <p><strong>Booking ID:</strong> ${booking.booking_id}</p>
-          <p><strong>Total Amount:</strong> $${booking.total_amount}</p>
+          <p><strong>Total Amount:</strong> ₹${booking.total_amount}</p>
         </div>
         
         <p>We look forward to seeing you at the event!</p>
@@ -149,7 +147,7 @@ class EmailService {
           <p><strong>Time:</strong> ${event.time}</p>
           <p><strong>Location:</strong> ${event.location}</p>
           <p><strong>Booking ID:</strong> ${booking.booking_id}</p>
-          <p><strong>Total Amount:</strong> $${booking.total_amount}</p>
+          <p><strong>Total Amount:</strong> ₹${booking.total_amount}</p>
         </div>
         
         <p>We look forward to seeing you there!</p>
@@ -178,7 +176,7 @@ class EmailService {
           <h3>${event.title}</h3>
           <p><strong>Date:</strong> ${event.date}</p>
           <p><strong>Booking ID:</strong> ${booking.booking_id}</p>
-          <p><strong>Refund Amount:</strong> $${booking.total_amount}</p>
+          <p><strong>Refund Amount:</strong> ₹${booking.total_amount}</p>
         </div>
         
         <p>Your refund will be processed within 5-7 business days.</p>
