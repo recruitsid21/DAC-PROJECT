@@ -20,13 +20,7 @@ export default function ForgotPassword() {
 
       if (response.data.resetURL) {
         setSuccess("RESET_LINK::" + response.data.resetURL);
-      }
-      // if (response.data.resetURL) {
-      //   // For development, show the reset URL
-      //   setSuccess(
-      //     `Password reset link has been generated. For development, you can use this link: ${response.data.resetURL}`
-      //   );
-      else {
+      } else {
         setSuccess("Password reset link has been sent to your email address.");
       }
     } catch (err) {
@@ -112,17 +106,41 @@ export default function ForgotPassword() {
               {loading ? "Sending..." : "Generate Reset Link"}
             </button>
 
-            {/* Enable for later implementation */}
-            {/* <button
+            {/* Implementation of email sending */}
+            <button
               type="button"
-              onClick={() => {
-                // TODO: Implement email sending functionality
-                alert("Email functionality will be implemented later!");
+              onClick={async () => {
+                if (!email) {
+                  setError("Please enter an email address first.");
+                  return;
+                }
+
+                setLoading(true);
+                setError("");
+                setSuccess("");
+
+                try {
+                  const response = await api.post("/auth/send-reset-email", {
+                    email,
+                  });
+
+                  setSuccess(
+                    response.data.message || "Email sent successfully!"
+                  );
+                } catch (err) {
+                  setError(
+                    err.response?.data?.message ||
+                      "Failed to send reset email. Please try again."
+                  );
+                } finally {
+                  setLoading(false);
+                }
               }}
               className="flex-1 group relative flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={loading || !email}
             >
-              Send Email Later
-            </button> */}
+              {loading ? "Sending..." : "Send Email"}
+            </button>
           </div>
 
           <div className="text-center">
