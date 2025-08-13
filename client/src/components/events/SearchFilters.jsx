@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
 export default function SearchFilters({ onSearch, categories }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,6 +9,7 @@ export default function SearchFilters({ onSearch, categories }) {
   const [sortBy, setSortBy] = useState("date_asc");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,145 +43,122 @@ export default function SearchFilters({ onSearch, categories }) {
     });
   };
 
+  const inputStyle =
+    "px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm";
+
   return (
-    <div className="mb-8 bg-white p-4 rounded-lg shadow">
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-      >
-        <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            🔍 Search Events
-          </label>
-          <div className="relative">
+    <div className="sticky top-4 z-20 bg-white/80 backdrop-blur-lg border border-gray-100 rounded-2xl shadow-lg p-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Main toolbar row */}
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Search */}
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <span className="text-gray-500">🔍</span>
             <input
               type="text"
-              id="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by event name or location"
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Search events..."
+              className={`${inputStyle} flex-1`}
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            🗂️ Category
-          </label>
+          {/* Category */}
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
+            className={inputStyle}
           >
             <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id}>
-                {category.name}
+            {categories.map((cat) => (
+              <option key={cat.category_id} value={cat.category_id}>
+                {cat.name}
               </option>
             ))}
           </select>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            📊 Sort By
-          </label>
+          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
+            className={inputStyle}
           >
-            <option value="date_asc">Date (Earliest)</option>
-            <option value="date_desc">Date (Latest)</option>
-            <option value="price_asc">Price (Low to High)</option>
-            <option value="price_desc">Price (High to Low)</option>
+            <option value="date_asc">Earliest</option>
+            <option value="date_desc">Latest</option>
+            <option value="price_asc">Price ↑</option>
+            <option value="price_desc">Price ↓</option>
           </select>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            🗓️ From Date
-          </label>
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            🗓️ To Date
-          </label>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            💰 Min Price (₹)
-          </label>
-          <input
-            type="number"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            min="0"
-            placeholder="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            💸 Max Price (₹)
-          </label>
-          <input
-            type="number"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            min="0"
-            placeholder="Any"
-            className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* Submit & Reset buttons inside the form */}
-        <div className="col-span-full flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 pt-4">
+          {/* Toggle Advanced */}
           <button
             type="button"
-            onClick={handleReset}
-            className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 transition"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
           >
-            Reset
+            {showAdvanced ? (
+              <>
+                <ChevronUpIcon className="w-4 h-4" /> Hide Filters
+              </>
+            ) : (
+              <>
+                <ChevronDownIcon className="w-4 h-4" /> Advanced
+              </>
+            )}
           </button>
+
+          {/* Buttons */}
           <button
             type="submit"
-            className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition"
+            className="px-5 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-md transition"
           >
-            Apply Filters
+            Apply
           </button>
         </div>
+
+        {/* Advanced section */}
+        {showAdvanced && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-gray-100">
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className={inputStyle}
+              placeholder="From date"
+            />
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className={inputStyle}
+              placeholder="To date"
+            />
+            <input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              min="0"
+              placeholder="Min Price ₹"
+              className={inputStyle}
+            />
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              min="0"
+              placeholder="Max Price ₹"
+              className={inputStyle}
+            />
+            <div className="col-span-full flex justify-end gap-2 mt-2">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-4 py-2 text-sm rounded-full border border-gray-200 bg-white hover:bg-gray-100 transition"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
