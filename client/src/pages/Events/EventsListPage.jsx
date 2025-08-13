@@ -143,6 +143,22 @@ export default function EventsListPage() {
     setFilters((prev) => ({ ...prev, ...newFilters, page: 1 })); // Reset page to 1
   }, []);
 
+  // Reset all filters completely, including search and UI inputs
+  const handleClearFilters = () => {
+    setEvents([]);
+    setFilters({
+      search: "",
+      category: "",
+      dateFrom: "",
+      dateTo: "",
+      sortBy: "date_asc",
+      minPrice: undefined,
+      maxPrice: undefined,
+      page: 1,
+      limit: 9,
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page title and description */}
@@ -152,7 +168,11 @@ export default function EventsListPage() {
       </p>
 
       {/* Search and filter UI */}
-      <SearchFilters onSearch={handleSearch} categories={categories} />
+      <SearchFilters
+        onSearch={handleSearch}
+        categories={categories}
+        values={filters} // Pass current filter values for UI sync
+      />
 
       {/* Display error if any */}
       {error && (
@@ -206,19 +226,7 @@ export default function EventsListPage() {
           </div>
           {/* Reset filters button */}
           <button
-            onClick={() =>
-              setFilters({
-                search: "",
-                category: "",
-                dateFrom: "",
-                dateTo: "",
-                sortBy: "date_asc",
-                minPrice: undefined,
-                maxPrice: undefined,
-                page: 1,
-                limit: 9,
-              })
-            }
+            onClick={handleClearFilters}
             className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-md hover:shadow-lg"
           >
             Clear Filters

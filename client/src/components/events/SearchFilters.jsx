@@ -1,17 +1,28 @@
 import { useState, useEffect } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
-export default function SearchFilters({ onSearch, categories }) {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function SearchFilters({ onSearch, categories, values }) {
+  const [searchTerm, setSearchTerm] = useState(values.search || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
 
-  const [category, setCategory] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [sortBy, setSortBy] = useState("date_asc");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [category, setCategory] = useState(values.category || "");
+  const [dateFrom, setDateFrom] = useState(values.dateFrom || "");
+  const [dateTo, setDateTo] = useState(values.dateTo || "");
+  const [sortBy, setSortBy] = useState(values.sortBy || "date_asc");
+  const [minPrice, setMinPrice] = useState(values.minPrice || "");
+  const [maxPrice, setMaxPrice] = useState(values.maxPrice || "");
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Sync local state when parent values change (e.g., Clear Filters)
+  useEffect(() => {
+    setSearchTerm(values.search || "");
+    setCategory(values.category || "");
+    setDateFrom(values.dateFrom || "");
+    setDateTo(values.dateTo || "");
+    setSortBy(values.sortBy || "date_asc");
+    setMinPrice(values.minPrice || "");
+    setMaxPrice(values.maxPrice || "");
+  }, [values]);
 
   // Debounce only the search term (400ms delay)
   useEffect(() => {
@@ -40,10 +51,10 @@ export default function SearchFilters({ onSearch, categories }) {
     sortBy,
     minPrice,
     maxPrice,
-    onSearch, // safe now because of useCallback in parent
+    onSearch,
   ]);
 
-  // Reset all filters
+  // Reset all filters locally
   const handleReset = () => {
     setSearchTerm("");
     setCategory("");
