@@ -137,11 +137,11 @@ export default function EventsListPage() {
   }, []);
 
   // Handle new filter input (e.g., search or category change)
-  const handleSearch = (newFilters) => {
+  const handleSearch = useCallback((newFilters) => {
     console.log("Applying new filters:", newFilters);
     setEvents([]); // Reset events for new filter
-    setFilters({ ...filters, ...newFilters, page: 1 }); // Reset page to 1
-  };
+    setFilters((prev) => ({ ...prev, ...newFilters, page: 1 })); // Reset page to 1
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -61,7 +61,7 @@ class Event {
   static async findAll({
     page = 1,
     limit = 10,
-    category,
+    category, // expects category_id
     search,
     dateFrom,
     dateTo,
@@ -69,46 +69,51 @@ class Event {
     maxPrice,
     sortBy = "date_asc",
   } = {}) {
-    let query = `SELECT e.*, u.name as organizer_name, c.name as category_name 
-                 FROM events e
-                 LEFT JOIN users u ON e.organizer_id = u.user_id
-                 LEFT JOIN categories c ON e.category_id = c.category_id
-                 WHERE e.is_active = TRUE`;
+    // Base query with joins
+    let query = `
+    SELECT e.*, u.name AS organizer_name, c.name AS category_name
+    FROM events e
+    LEFT JOIN users u ON e.organizer_id = u.user_id
+    LEFT JOIN categories c ON e.category_id = c.category_id
+    WHERE e.is_active = TRUE
+  `;
 
     const params = [];
 
+    // Category filter
     if (category) {
-      query += " AND c.name = ?";
+      query += " AND e.category_id = ?";
       params.push(category);
     }
 
+    // Search filter
     if (search) {
       query +=
         " AND (e.title LIKE ? OR e.description LIKE ? OR e.location LIKE ?)";
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
+    // Date filters
     if (dateFrom) {
       query += " AND e.date >= ?";
       params.push(dateFrom);
     }
-
     if (dateTo) {
       query += " AND e.date <= ?";
       params.push(dateTo);
     }
 
+    // Price filters
     if (minPrice !== undefined && minPrice !== "") {
       query += " AND e.price >= ?";
       params.push(parseFloat(minPrice));
     }
-
     if (maxPrice !== undefined && maxPrice !== "") {
       query += " AND e.price <= ?";
       params.push(parseFloat(maxPrice));
     }
 
-    // Add sorting
+    // Sorting
     switch (sortBy) {
       case "date_asc":
         query += " ORDER BY e.date ASC, e.time ASC";
@@ -126,7 +131,7 @@ class Event {
         query += " ORDER BY e.date ASC, e.time ASC";
     }
 
-    // Add pagination
+    // Pagination
     const offset = (page - 1) * limit;
     query += " LIMIT ? OFFSET ?";
     params.push(limit, offset);

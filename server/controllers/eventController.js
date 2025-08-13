@@ -7,7 +7,7 @@ class EventController {
     try {
       const {
         search,
-        category,
+        category, // from query string
         dateFrom,
         dateTo,
         sortBy,
@@ -29,11 +29,12 @@ class EventController {
         limit,
       });
 
+      // Pass category as category_id to Event.findAll
       const events = await Event.findAll({
         page: parseInt(page),
         limit: parseInt(limit),
         search,
-        category,
+        category: category ? parseInt(category) : undefined, // key fix
         dateFrom,
         dateTo,
         sortBy,
