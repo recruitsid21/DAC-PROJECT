@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import api from "../services/api";
 
 export default function Signup() {
@@ -40,6 +41,9 @@ export default function Signup() {
     setLoading(true);
     try {
       await api.post("/auth/register", { name, email, password, phone });
+      setTimeout(() => {
+        toast.success("Registration successful! Please log in.");
+      }, 3000);
       navigate("/login?registered=true");
     } catch (err) {
       setError(

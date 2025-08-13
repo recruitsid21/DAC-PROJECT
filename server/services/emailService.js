@@ -55,7 +55,7 @@ class EmailService {
       <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
         <h4>${event.title}</h4>
         <p>Date: ${event.date}</p>
-        <p>Price: $${event.price}</p>
+        <p>Price: ₹${event.price}</p>
         <a href="${process.env.CLIENT_URL}/events/${event.event_id}" style="color: #007bff;">View Event</a>
       </div>
     `

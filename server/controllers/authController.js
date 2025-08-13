@@ -466,7 +466,7 @@ class AuthController {
     }
   }
 
-  // Separate method for sending email (for later use)
+  // Separate method for sending email
   static async sendResetEmail(req, res, next) {
     try {
       const { email } = req.body;

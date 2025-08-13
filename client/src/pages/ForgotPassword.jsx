@@ -25,8 +25,9 @@ export default function ForgotPassword() {
 
       if (response.data.resetURL) {
         setResetLink(response.data.resetURL);
-        setSuccess("RESET_LINK::" + response.data.resetURL);
-        alert(`Generated Reset Link:\n${response.data.resetURL}`); // popup for developer
+        // setSuccess("RESET_LINK::" + response.data.resetURL);
+        setSuccess("Password reset link generated successfully.");
+        // alert(`Generated Reset Link:\n${response.data.resetURL}`); // popup for developer
       } else {
         setSuccess("Password reset link generated (no direct URL provided).");
       }
@@ -91,8 +92,18 @@ export default function ForgotPassword() {
           </div>
         )}
         {success && (
-          <div className="bg-blue-50 border border-blue-400 text-blue-700 px-4 py-4 rounded shadow-md">
-            {success}
+          <div className="bg-blue-50 border border-blue-400 text-blue-700 px-4 py-4 rounded shadow-md break-words overflow-hidden">
+            <p>{success}</p>
+            {resetLink && (
+              <a
+                href={resetLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 underline font-semibold"
+              >
+                Click here to reset your password
+              </a>
+            )}
           </div>
         )}
 
