@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
 export default function SearchFilters({ onSearch, categories, values }) {
@@ -12,6 +12,9 @@ export default function SearchFilters({ onSearch, categories, values }) {
   const [minPrice, setMinPrice] = useState(values.minPrice || "");
   const [maxPrice, setMaxPrice] = useState(values.maxPrice || "");
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Ref for the dropdown panel to close on outside click
+  const dropdownRef = useRef();
 
   // Sync local state when parent values change (e.g., Clear Filters)
   useEffect(() => {
@@ -51,8 +54,19 @@ export default function SearchFilters({ onSearch, categories, values }) {
     sortBy,
     minPrice,
     maxPrice,
-    onSearch, // safe because parent uses useCallback
+    onSearch,
   ]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowAdvanced(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Reset all filters locally and trigger parent onSearch
   const handleReset = () => {
@@ -64,7 +78,6 @@ export default function SearchFilters({ onSearch, categories, values }) {
     setMinPrice("");
     setMaxPrice("");
 
-    // Trigger parent to reset events
     onSearch({
       search: "",
       category: "",
@@ -120,68 +133,72 @@ export default function SearchFilters({ onSearch, categories, values }) {
           <option value="price_desc">Price ↓</option>
         </select>
 
-        {/* Advanced Toggle */}
-        <button
-          type="button"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
-        >
-          {showAdvanced ? (
-            <>
-              <ChevronUpIcon className="w-4 h-4" /> Hide Filters
-            </>
-          ) : (
-            <>
-              <ChevronDownIcon className="w-4 h-4" /> Advanced
-            </>
+        {/* Advanced Dropdown Toggle */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((prev) => !prev)}
+            className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
+          >
+            {showAdvanced ? (
+              <>
+                <ChevronUpIcon className="w-4 h-4" /> Hide Filters
+              </>
+            ) : (
+              <>
+                <ChevronDownIcon className="w-4 h-4" /> Advanced
+              </>
+            )}
+          </button>
+
+          {/* Dropdown Panel */}
+          {showAdvanced && (
+            <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 shadow-lg rounded-xl p-4 z-50">
+              <div className="grid grid-cols-1 gap-3">
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className={inputStyle}
+                  placeholder="From Date"
+                />
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className={inputStyle}
+                  placeholder="To Date"
+                />
+                <input
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  min="0"
+                  placeholder="Min Price ₹"
+                  className={inputStyle}
+                />
+                <input
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  min="0"
+                  placeholder="Max Price ₹"
+                  className={inputStyle}
+                />
+
+                {/* Reset Button */}
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="px-4 py-2 text-sm rounded-full border border-gray-200 bg-white hover:bg-gray-100 transition mt-2 w-full"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
           )}
-        </button>
-      </div>
-
-      {/* Advanced Filters Section */}
-      {showAdvanced && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-gray-100">
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className={inputStyle}
-          />
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className={inputStyle}
-          />
-          <input
-            type="number"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            min="0"
-            placeholder="Min Price ₹"
-            className={inputStyle}
-          />
-          <input
-            type="number"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            min="0"
-            placeholder="Max Price ₹"
-            className={inputStyle}
-          />
-
-          {/* Reset Button */}
-          <div className="col-span-full flex justify-end gap-2 mt-2">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-4 py-2 text-sm rounded-full border border-gray-200 bg-white hover:bg-gray-100 transition"
-            >
-              Reset
-            </button>
-          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
