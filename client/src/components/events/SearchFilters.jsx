@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
 export default function SearchFilters({ onSearch, categories, values }) {
+  // Local state for all filters
   const [searchTerm, setSearchTerm] = useState(values.search || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-
   const [category, setCategory] = useState(values.category || "");
   const [dateFrom, setDateFrom] = useState(values.dateFrom || "");
   const [dateTo, setDateTo] = useState(values.dateTo || "");
@@ -51,10 +51,10 @@ export default function SearchFilters({ onSearch, categories, values }) {
     sortBy,
     minPrice,
     maxPrice,
-    onSearch,
+    onSearch, // safe because parent uses useCallback
   ]);
 
-  // Reset all filters locally
+  // Reset all filters locally and trigger parent onSearch
   const handleReset = () => {
     setSearchTerm("");
     setCategory("");
@@ -63,6 +63,17 @@ export default function SearchFilters({ onSearch, categories, values }) {
     setSortBy("date_asc");
     setMinPrice("");
     setMaxPrice("");
+
+    // Trigger parent to reset events
+    onSearch({
+      search: "",
+      category: "",
+      dateFrom: "",
+      dateTo: "",
+      sortBy: "date_asc",
+      minPrice: undefined,
+      maxPrice: undefined,
+    });
   };
 
   const inputStyle =
