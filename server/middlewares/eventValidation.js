@@ -1,6 +1,6 @@
-const AppError = require("../utils/appError");
+import AppError from "../utils/appError.js";
 
-const validateEventData = (req, res, next) => {
+export const validateEventData = (req, res, next) => {
   try {
     const {
       title,
@@ -92,8 +92,4 @@ const validateEventData = (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-module.exports = {
-  validateEventData,
 };

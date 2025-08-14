@@ -1,10 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const BookingController = require("../controllers/bookingController");
-const {
+import express from "express";
+import BookingController from "../controllers/bookingController.js";
+import {
   protect,
   isBookingOwnerOrAdmin,
-} = require("../middlewares/authMiddleware");
+} from "../middlewares/authMiddleware.js";
+
+const router = express.Router();
 
 // Protected routes
 router.post("/", protect, BookingController.createBooking);
@@ -23,4 +24,4 @@ router.patch(
 );
 router.post("/:id/confirm", protect, BookingController.confirmBooking);
 
-module.exports = router;
+export default router;

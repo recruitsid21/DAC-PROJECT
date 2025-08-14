@@ -1,6 +1,6 @@
-const multer = require("multer");
-const path = require("path");
-const AppError = require("./appError");
+import multer from "multer";
+import path from "path";
+import AppError from "./appError.js";
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -34,4 +34,4 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-module.exports = upload;
+export default upload;

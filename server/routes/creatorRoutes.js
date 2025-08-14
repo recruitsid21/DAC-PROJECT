@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import CreatorController from "../controllers/creatorController.js";
+import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const CreatorController = require("../controllers/creatorController");
-const { protect, restrictTo } = require("../middlewares/authMiddleware");
 
 // Protect all routes and restrict to organizers
 router.use(protect, restrictTo("organizer"));
@@ -20,4 +21,4 @@ router.delete("/events/:id", CreatorController.deleteEvent);
 // Seat management
 router.post("/events/:id/seats", CreatorController.addSeats);
 
-module.exports = router;
+export default router;

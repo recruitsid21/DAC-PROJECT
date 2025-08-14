@@ -1,7 +1,7 @@
-const Booking = require("../models/bookingModel");
-const AppError = require("../utils/appError");
-const Razorpay = require("razorpay");
-const crypto = require("crypto");
+import Booking from "../models/bookingModel.js";
+import AppError from "../utils/appError.js";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -181,4 +181,4 @@ class PaymentController {
   }
 }
 
-module.exports = PaymentController;
+export default PaymentController;

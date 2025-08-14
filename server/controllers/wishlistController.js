@@ -1,5 +1,5 @@
-const Wishlist = require("../models/wishlistModel");
-const AppError = require("../utils/appError");
+import Wishlist from "../models/wishlistModel.js";
+import AppError from "../utils/appError.js";
 
 class WishlistController {
   static async addToWishlist(req, res, next) {
@@ -93,4 +93,4 @@ class WishlistController {
   }
 }
 
-module.exports = WishlistController;
+export default WishlistController;

@@ -1,5 +1,5 @@
-const nodemailer = require("nodemailer");
-const AppError = require("../utils/appError");
+import nodemailer from "nodemailer";
+import AppError from "../utils/appError.js";
 
 class EmailService {
   constructor() {
@@ -263,4 +263,4 @@ class EmailService {
   }
 }
 
-module.exports = EmailService;
+export default EmailService;

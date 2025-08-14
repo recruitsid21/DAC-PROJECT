@@ -1,4 +1,4 @@
-const db = require("../config/db");
+import db from "../config/db.js";
 
 class WelcomeMessage {
   static async create({ userId, message, type = "welcome" }) {
@@ -83,4 +83,4 @@ class WelcomeMessage {
   }
 }
 
-module.exports = WelcomeMessage;
+export default WelcomeMessage;

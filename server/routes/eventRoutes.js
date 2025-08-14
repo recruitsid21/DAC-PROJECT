@@ -1,9 +1,10 @@
-const express = require("express");
+import express from "express";
+import EventController from "../controllers/eventController.js";
+import { protect } from "../middlewares/authMiddleware.js";
+import { validateEventData } from "../middlewares/eventValidation.js";
+import upload from "../utils/multer.js";
+
 const router = express.Router();
-const EventController = require("../controllers/eventController");
-const { protect } = require("../middlewares/authMiddleware");
-const { validateEventData } = require("../middlewares/eventValidation");
-const upload = require("../utils/multer");
 
 router.get("/", EventController.getAllEvents);
 router.get("/:id/seats", EventController.getEventSeats);
@@ -35,4 +36,4 @@ router.post(
   EventController.addEventImage
 );
 
-module.exports = router;
+export default router;

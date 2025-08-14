@@ -1,9 +1,9 @@
-const Booking = require("../models/bookingModel");
-const Event = require("../models/eventModel");
-const User = require("../models/userModel");
-const AppError = require("../utils/appError");
-const EmailService = require("../services/emailService");
-const db = require("../config/db");
+import Booking from "../models/bookingModel.js";
+import Event from "../models/eventModel.js";
+import User from "../models/userModel.js";
+import AppError from "../utils/appError.js";
+import EmailService from "../services/emailService.js";
+import db from "../config/db.js";
 
 const emailService = new EmailService();
 
@@ -340,4 +340,4 @@ class BookingController {
   }
 }
 
-module.exports = BookingController;
+export default BookingController;

@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import UserController from "../controllers/userController.js";
+import { protect } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const UserController = require("../controllers/userController");
-const { protect } = require("../middlewares/authMiddleware");
 
 // Protect all routes
 router.use(protect);
@@ -12,4 +13,4 @@ router.get("/stats", UserController.getDashboardStats);
 // User bookings
 router.get("/bookings", UserController.getMyBookings);
 
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
-const AppError = require("../utils/appError");
-const db = require("../config/db");
+import AppError from "../utils/appError.js";
+import db from "../config/db.js";
 
 class UserController {
   // Get user profile
@@ -268,4 +268,4 @@ class UserController {
   }
 }
 
-module.exports = UserController;
+export default UserController;

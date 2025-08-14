@@ -1,6 +1,6 @@
-const bcrypt = require("bcryptjs");
+import bcrypt from "bcryptjs";
 
 const password = "password123";
-bcrypt.hash(password, 12).then((hash) => {
-  console.log("Generated hash for password:", hash);
-});
+
+const hash = await bcrypt.hash(password, 12);
+console.log("Generated hash for password:", hash);

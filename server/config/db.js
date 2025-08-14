@@ -1,5 +1,6 @@
-require("dotenv").config(); // Add this at the top
-const mysql = require("mysql2/promise");
+import "dotenv/config"; // loads .env automatically
+
+import mysql from "mysql2/promise";
 
 // Create a connection pool with proper error handling
 const pool = mysql.createPool({
@@ -50,4 +51,4 @@ async function testConnection() {
 
 testConnection();
 
-module.exports = pool;
+export default pool;

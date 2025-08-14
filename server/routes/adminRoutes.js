@@ -1,9 +1,10 @@
-const express = require("express");
+import express from "express";
+import AdminController from "../controllers/adminController.js";
+import { protect, restrictTo } from "../middlewares/authMiddleware.js";
+import User from "../models/userModel.js";
+import Category from "../models/categoryModel.js";
+
 const router = express.Router();
-const AdminController = require("../controllers/adminController");
-const { protect, restrictTo } = require("../middlewares/authMiddleware");
-const User = require("../models/userModel");
-const Category = require("../models/categoryModel");
 
 // Quick setup routes (remove in production)
 router.post("/setup", async (req, res) => {
@@ -44,7 +45,7 @@ router.delete("/users/:id", AdminController.deleteUser);
 // Event management
 router.get("/events", AdminController.getAllEvents);
 router.patch("/events/:id/toggle-status", AdminController.toggleEventStatus);
-router.delete("/events/:id", AdminController.deleteEvent); // Add this route
+router.delete("/events/:id", AdminController.deleteEvent);
 
 // Booking management
 router.get("/bookings", AdminController.getAllBookings);
@@ -65,4 +66,4 @@ router.patch(
 // Reports
 router.get("/reports", AdminController.getReports);
 
-module.exports = router;
+export default router;

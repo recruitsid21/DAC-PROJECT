@@ -1,4 +1,4 @@
-const db = require("../config/db");
+import db from "../config/db.js";
 
 class Booking {
   static async create({ event_id, user_id, total_amount }) {
@@ -228,4 +228,4 @@ class Booking {
   }
 }
 
-module.exports = Booking;
+export default Booking;

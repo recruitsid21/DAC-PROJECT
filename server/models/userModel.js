@@ -1,8 +1,9 @@
-const db = require("../config/db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import db from "../config/db.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+
 const { JWT_SECRET, JWT_EXPIRES_IN, REFRESH_TOKEN_EXPIRES_IN } = process.env;
-const crypto = require("crypto");
 
 class User {
   static async findByEmail(email) {
@@ -163,4 +164,4 @@ class User {
   }
 }
 
-module.exports = User;
+export default User;

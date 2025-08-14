@@ -1,4 +1,4 @@
-const db = require("../config/db");
+import db from "../config/db.js";
 
 class Event {
   static async create({
@@ -267,4 +267,4 @@ class Event {
   }
 }
 
-module.exports = Event;
+export default Event;

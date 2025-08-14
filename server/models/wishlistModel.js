@@ -1,4 +1,4 @@
-const db = require("../config/db");
+import db from "../config/db.js";
 
 class Wishlist {
   static async add(userId, eventId) {
@@ -55,4 +55,4 @@ class Wishlist {
   }
 }
 
-module.exports = Wishlist;
+export default Wishlist;

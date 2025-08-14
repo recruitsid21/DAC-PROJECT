@@ -1,9 +1,9 @@
-const User = require("../models/userModel");
+import User from "../models/userModel.js";
 const { JWT_SECRET } = process.env;
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
-const AppError = require("../utils/appError");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import AppError from "../utils/appError.js";
 
 class AuthController {
   static async register(req, res, next) {
@@ -520,4 +520,4 @@ class AuthController {
   }
 }
 
-module.exports = AuthController;
+export default AuthController;

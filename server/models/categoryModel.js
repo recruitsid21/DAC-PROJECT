@@ -1,4 +1,4 @@
-const db = require("../config/db");
+import db from "../config/db.js";
 
 class Category {
   static async findAll() {
@@ -51,4 +51,4 @@ class Category {
   }
 }
 
-module.exports = Category;
+export default Category;

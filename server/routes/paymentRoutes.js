@@ -1,10 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const PaymentController = require("../controllers/paymentController");
-const {
+import express from "express";
+import PaymentController from "../controllers/paymentController.js";
+import {
   protect,
   isBookingOwnerOrAdmin,
-} = require("../middlewares/authMiddleware");
+} from "../middlewares/authMiddleware.js";
+
+const router = express.Router();
 
 // Protected routes
 router.post("/create-intent", protect, PaymentController.createPaymentIntent);
@@ -19,4 +20,4 @@ router.get(
 // Webhook (no protection as it's called by payment provider)
 router.post("/webhook", PaymentController.handleWebhook);
 
-module.exports = router;
+export default router;

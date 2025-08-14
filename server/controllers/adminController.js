@@ -1,9 +1,9 @@
-const User = require("../models/userModel");
-const Event = require("../models/eventModel");
-const Booking = require("../models/bookingModel");
-const Category = require("../models/categoryModel");
-const AppError = require("../utils/appError");
-const db = require("../config/db");
+import User from "../models/userModel.js";
+import Event from "../models/eventModel.js";
+import Booking from "../models/bookingModel.js";
+import Category from "../models/categoryModel.js";
+import AppError from "../utils/appError.js";
+import db from "../config/db.js";
 
 class AdminController {
   static async getAllUsers(req, res, next) {
@@ -822,4 +822,4 @@ class AdminController {
   }
 }
 
-module.exports = AdminController;
+export default AdminController;

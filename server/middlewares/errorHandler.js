@@ -1,4 +1,4 @@
-const AppError = require("../utils/appError");
+import AppError from "../utils/appError.js";
 
 // Handle specific database errors
 const handleCastErrorDB = (err) => {
@@ -36,8 +36,8 @@ const sendErrorDev = (err, res) => {
 
 // Production error response
 const sendErrorProd = (err, res) => {
-  // Operational, trusted error: send message to client
   if (err.isOperational) {
+    // Operational, trusted error: send message to client
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
@@ -53,7 +53,7 @@ const sendErrorProd = (err, res) => {
 };
 
 // Global error handling middleware
-module.exports = (err, req, res, next) => {
+export default (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 

@@ -1,27 +1,33 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const mongoSanitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
-const hpp = require("hpp");
-const path = require("path");
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Import routes
-const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const eventRoutes = require("./routes/eventRoutes");
-const bookingRoutes = require("./routes/bookingRoutes");
-const wishlistRoutes = require("./routes/wishlistRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-const adminRoutes = require("./routes/adminRoutes");
-const creatorRoutes = require("./routes/creatorRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import creatorRoutes from "./routes/creatorRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 
 // Import middlewares
-const errorHandler = require("./middlewares/errorHandler");
+import errorHandler from "./middlewares/errorHandler.js";
+
+// Fix __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Custom error class
 class AppError extends Error {
@@ -130,4 +136,4 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 // Export app for server.js to use
-module.exports = app;
+export default app;

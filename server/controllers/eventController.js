@@ -1,6 +1,6 @@
-const Event = require("../models/eventModel");
-const Category = require("../models/categoryModel");
-const AppError = require("../utils/appError");
+import Event from "../models/eventModel.js";
+import Category from "../models/categoryModel.js";
+import AppError from "../utils/appError.js";
 
 class EventController {
   static async getAllEvents(req, res, next) {
@@ -333,4 +333,4 @@ class EventController {
   }
 }
 
-module.exports = EventController;
+export default EventController;

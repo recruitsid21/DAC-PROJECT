@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import WishlistController from "../controllers/wishlistController.js";
+import { protect } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const WishlistController = require("../controllers/wishlistController");
-const { protect } = require("../middlewares/authMiddleware");
 
 // All routes are protected and require authentication
 router.use(protect);
@@ -21,4 +22,4 @@ router.get("/check/:id", WishlistController.checkWishlist);
 // Get user's wishlist count
 router.get("/count", WishlistController.getWishlistCount);
 
-module.exports = router;
+export default router;

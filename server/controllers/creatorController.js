@@ -1,7 +1,7 @@
-const Event = require("../models/eventModel");
-const Booking = require("../models/bookingModel");
-const AppError = require("../utils/appError");
-const db = require("../config/db");
+import Event from "../models/eventModel.js";
+import Booking from "../models/bookingModel.js";
+import AppError from "../utils/appError.js";
+import db from "../config/db.js";
 
 class CreatorController {
   static async getMyEvents(req, res, next) {
@@ -462,7 +462,10 @@ class CreatorController {
         [req.params.id]
       );
 
-      if (activeBookings[0].count > 0 && event[0].available_seats < event[0].total_seats) {
+      if (
+        activeBookings[0].count > 0 &&
+        event[0].available_seats < event[0].total_seats
+      ) {
         await connection.rollback();
         connection.release();
         return next(
@@ -482,10 +485,9 @@ class CreatorController {
 
         // Delete payments first (they reference bookings)
         for (const booking of bookings) {
-          await connection.query(
-            "DELETE FROM payments WHERE booking_id = ?",
-            [booking.booking_id]
-          );
+          await connection.query("DELETE FROM payments WHERE booking_id = ?", [
+            booking.booking_id,
+          ]);
         }
 
         // Then delete booked seats
@@ -497,22 +499,19 @@ class CreatorController {
         );
 
         // Then delete bookings
-        await connection.query(
-          "DELETE FROM bookings WHERE event_id = ?",
-          [req.params.id]
-        );
+        await connection.query("DELETE FROM bookings WHERE event_id = ?", [
+          req.params.id,
+        ]);
 
         // Delete seats
-        await connection.query(
-          "DELETE FROM seats WHERE event_id = ?",
-          [req.params.id]
-        );
+        await connection.query("DELETE FROM seats WHERE event_id = ?", [
+          req.params.id,
+        ]);
 
         // Finally delete the event
-        await connection.query(
-          "DELETE FROM events WHERE event_id = ?",
-          [req.params.id]
-        );
+        await connection.query("DELETE FROM events WHERE event_id = ?", [
+          req.params.id,
+        ]);
 
         await connection.commit();
 
@@ -529,7 +528,7 @@ class CreatorController {
         try {
           await connection.rollback();
         } catch (rollbackError) {
-          console.error('Error rolling back transaction:', rollbackError);
+          console.error("Error rolling back transaction:", rollbackError);
         }
       }
       next(err);
@@ -541,4 +540,4 @@ class CreatorController {
   }
 }
 
-module.exports = CreatorController;
+export default CreatorController;

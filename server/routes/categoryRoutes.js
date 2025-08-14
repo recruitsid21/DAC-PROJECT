@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import Category from "../models/categoryModel.js";
+
 const router = express.Router();
-const Category = require("../models/categoryModel");
 
 // Get all active categories
 router.get("/", async (req, res, next) => {
@@ -17,4 +18,4 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

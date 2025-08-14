@@ -1,6 +1,14 @@
-require("dotenv").config({ path: `${__dirname}/../.env` }); // Explicit path to .env
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import app from "./app.js";
 
-const app = require("./app");
+// Fix __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Explicit path to .env
+dotenv.config({ path: `${__dirname}/../.env` });
 
 // Validate essential environment variables
 const requiredEnvVars = [
